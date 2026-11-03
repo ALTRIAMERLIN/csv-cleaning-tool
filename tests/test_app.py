@@ -53,3 +53,15 @@ def test_ui_rules_change_warns():
     next(b for b in at.button if b.label == "Run cleaning").click().run()
     at.radio(key="keep").set_value("last").run()
     assert any("Rules changed" in w.value for w in at.warning)
+
+
+def test_ui_failed_check_says_failed(monkeypatch):
+    from csvclean import core
+
+    monkeypatch.setattr(core, "check_accounting", lambda files, counts: False)
+    at = start()
+    at.button[0].click().run()
+    next(b for b in at.button if b.label == "Run cleaning").click().run()
+    assert not at.exception
+    assert any(e.value.startswith("Output check failed") for e in at.error)
+    assert not any("passed" in cap.value for cap in at.caption)

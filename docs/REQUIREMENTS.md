@@ -93,7 +93,9 @@ re-reading the rendered `clean.csv` and `issues.csv` bytes: every `source_row` f
 - An output path that exists but is not a folder, or any failure to create the folder or write a
   file, raises `OutputError` (CLI exit 2 with a message, no traceback). All four files are first
   written to temporary names in the output folder and renamed into place only after every write
-  succeeded; on failure the temporary files are removed, so no partial new output set is left.
+  succeeded. If a write fails, the temporary files are removed and no output file is changed.
+  Renames happen one file at a time: if a rename fails (rare), the error names the files already
+  replaced, so a folder that mixes new and old outputs is never left silently.
 
 ## 7. Interfaces
 

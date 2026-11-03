@@ -1,14 +1,20 @@
 """Drive the real Streamlit page in Edge: upload -> rules -> run -> download -> verify.
 
-Needs the app running:  streamlit run app.py --server.address 127.0.0.1
-Usage: python scripts/ui_check.py OUT_DIR [--video]
+Usage: python scripts/ui_check.py OUT_DIR [--video] [--start-app]
+  --start-app  start app.py on a free 127.0.0.1 port and stop it afterwards
+  (without it, the app must already be running at http://127.0.0.1:8501)
 Exit 0 only if every downloaded file is byte-identical to the core output.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import socket
+import subprocess
 import sys
+import time
+import urllib.request
+from contextlib import contextmanager
 from pathlib import Path
 
 from playwright.sync_api import Page, sync_playwright
@@ -44,7 +50,43 @@ def pick(page: Page, label: str, values: list[str]) -> None:
         raise RuntimeError(f"{label}: not selected {missing}")
 
 
-def main(out: Path, video: bool) -> int:
+@contextmanager
+def local_app():
+    """Start app.py on a free localhost port, yield its URL, always stop this child afterwards."""
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    proc = subprocess.Popen(
+        [sys.executable, "-m", "streamlit", "run", str(ROOT / "app.py"),
+         "--server.address", "127.0.0.1", "--server.port", str(port),
+         "--server.headless", "true", "--browser.gatherUsageStats", "false"],
+        cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    url = f"http://127.0.0.1:{port}"
+    try:
+        deadline = time.time() + 60
+        while True:
+            if proc.poll() is not None:
+                raise RuntimeError("Streamlit exited during startup")
+            try:
+                with urllib.request.urlopen(url + "/_stcore/health", timeout=2) as r:
+                    if r.read() == b"ok":
+                        break
+            except OSError:
+                pass
+            if time.time() > deadline:
+                raise RuntimeError("Streamlit did not start within 60 s")
+            time.sleep(1)
+        yield url
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait()
+
+
+def main(out: Path, video: bool, url: str = URL) -> int:
     out.mkdir(parents=True, exist_ok=True)
     shots, dl = out / "screens", out / "downloads"
     shots.mkdir(exist_ok=True)
@@ -56,7 +98,7 @@ def main(out: Path, video: bool) -> int:
             record_video_dir=str(out / "video") if video else None,
             record_video_size={"width": 1600, "height": 900} if video else None)
         page = ctx.new_page()
-        page.goto(URL)
+        page.goto(url)
         page.get_by_text("Upload a CSV file to begin").wait_for(timeout=30000)
         page.locator('input[type="file"]').set_input_files(str(CSV))
         page.get_by_text("Data rows").wait_for()
@@ -91,4 +133,10 @@ def main(out: Path, video: bool) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(Path(sys.argv[1]), "--video" in sys.argv))
+    out_dir, record = Path(sys.argv[1]), "--video" in sys.argv
+    if "--start-app" in sys.argv:
+        with local_app() as app_url:
+            code = main(out_dir, record, app_url)
+    else:
+        code = main(out_dir, record)
+    raise SystemExit(code)

@@ -410,3 +410,21 @@ def test_accounting_check_detects_tampering():
     mangled = dict(files, **{"clean.csv": rewrite_csv(
         files["clean.csv"], lambda x: [x[0], ["abc", *x[1][1:]], *x[2:]])})
     assert check_accounting(mangled, counts) is False
+
+
+# AC-34
+def test_failed_rename_is_reported(tmp_path, monkeypatch, capsys):
+    real, calls = core._replace_file, []
+
+    def flaky(src, dst):
+        calls.append(dst)
+        if len(calls) == 2:
+            raise OSError(13, "Permission denied")
+        real(src, dst)
+
+    monkeypatch.setattr(core, "_replace_file", flaky)
+    out = tmp_path / "o"
+    assert cli_main([str(DEMO_CSV), "--out", str(out), "--rules", str(DEMO_RULES)]) == 2
+    err = capsys.readouterr().err
+    assert "already replaced: clean.csv;" in err and "Traceback" not in err
+    assert sorted(p.name for p in out.iterdir()) == ["clean.csv"]  # temp files cleaned up

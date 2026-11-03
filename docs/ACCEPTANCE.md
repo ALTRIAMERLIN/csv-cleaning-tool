@@ -3,7 +3,9 @@
 Each case maps to at least one automated test in `tests/`. Status is filled from real `pytest` runs only.
 
 Statuses below come from the run saved in `test-results/` (`run_info.json` records the date,
-versions and a SHA-256 digest of the tested sources). After any code change, re-run
+versions and a SHA-256 digest of the tested sources: files git tracks or would track under
+`app.py`, `pyproject.toml`, `requirements.txt`, `src`, `tests`, `scripts`, `data`; ignored build
+files such as `*.egg-info` are excluded). After any code change, re-run
 `python scripts/run_tests.py`; `python scripts/run_tests.py --check` reports whether the saved
 results still match the current sources.
 
@@ -42,6 +44,7 @@ results still match the current sources.
 | AC-31 | Output path problems | `--out` is an existing file; 3rd file write fails | demo rules | exit 2, `error:` message, no traceback; the file is untouched; no output or temp files left | `test_cli_out_is_a_file`, `test_failed_write_leaves_nothing` | pass (pytest, 2026-11-03) |
 | AC-32 | Bad rules file | GBK-encoded JSON; invalid JSON | — | `RuleError`, exit 2, no outputs | `test_cli_bad_rules_file` | pass (pytest, 2026-11-03) |
 | AC-33 | Accounting check can fail | rendered `clean.csv` missing a row; `issues.csv` with a doubled row; non-numeric `source_row` | demo rules | `check_accounting` is `false` for each; `true` for the real output | `test_accounting_check_detects_tampering` | pass (pytest, 2026-11-03) |
+| AC-34 | Rename fails midway | 2nd rename raises `OSError` | demo rules | `OutputError` that names the file already replaced (`clean.csv`); no temp files left | `test_failed_rename_is_reported` | pass (pytest, 2026-11-03) |
 
 ## UI acceptance
 
@@ -50,6 +53,9 @@ results still match the current sources.
 | UI-01 | Page loads, asks for input | `tests/test_app.py::test_ui_waits_for_input` (Streamlit AppTest) | pass (pytest, 2026-11-03) |
 | UI-02 | Sample → demo rules → run shows expected counts and the ✅ output check | `tests/test_app.py::test_ui_full_flow_matches_expected` | pass (pytest, 2026-11-03) |
 | UI-03 | Changing rules after a run shows a "Rules changed" warning | `tests/test_app.py::test_ui_rules_change_warns` | pass (pytest, 2026-11-03) |
-| UI-04 | Real browser (Edge): upload file → preview → set rules → run → Issues tab → download 4 files; each download is byte-identical to the core output | `scripts/ui_check.py` against a running app | pass (2026-11-03, re-run after review fixes: 4/4 MATCH, counts 191 = 165 + 26) |
+| UI-05 | A failed output check reads as a failure (no "passed" wording) | `tests/test_app.py::test_ui_failed_check_says_failed` (check forced to fail) | pass (pytest, 2026-11-03) |
+| UI-04 | Real browser (Edge): upload file → preview → set rules → run → Issues tab → download 4 files; each download is byte-identical to the core output | `python scripts/ui_check.py OUT --start-app` | pass (2026-11-03, re-run after review fixes: 4/4 MATCH, counts 191 = 165 + 26) |
 
-UI-04 is not part of `pytest`; it needs the app running. Re-run before recording.
+UI-04 is not part of `pytest`. With `--start-app` the script starts the app on a free
+127.0.0.1 port and stops it afterwards; without it, the app must already run at
+127.0.0.1:8501. Re-run before recording.

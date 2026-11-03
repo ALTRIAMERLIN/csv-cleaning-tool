@@ -327,6 +327,10 @@ def _write_file(path: str, data: bytes) -> None:
         f.write(data)
 
 
+def _replace_file(src: str, dst: str) -> None:
+    os.replace(src, dst)
+
+
 def write_outputs(result: Result, out_dir: str, force: bool = False,
                   input_path: str | None = None) -> dict[str, bytes]:
     """Write all outputs into out_dir and return their bytes.
@@ -350,17 +354,22 @@ def write_outputs(result: Result, out_dir: str, force: bool = False,
             f"Output files already exist: {', '.join(existing)}. Use --force to overwrite."
         )
     temps = {name: os.path.join(out_dir, f".{name}.{os.getpid()}.tmp") for name in files}
+    replaced: list[str] = []
     try:
         os.makedirs(out_dir, exist_ok=True)
         for name, data in files.items():
             _write_file(temps[name], data)
         for name in files:
-            os.replace(temps[name], targets[name])
+            _replace_file(temps[name], targets[name])
+            replaced.append(name)
     except OSError as e:
         for p in temps.values():
             try:
                 os.remove(p)
             except OSError:
                 pass
-        raise OutputError(f"Could not write outputs to {out_dir}: {e.strerror or e}") from None
+        msg = f"Could not write outputs to {out_dir}: {e.strerror or e}"
+        if replaced:
+            msg += f"; already replaced: {', '.join(replaced)}; the other outputs were not updated"
+        raise OutputError(msg) from None
     return files

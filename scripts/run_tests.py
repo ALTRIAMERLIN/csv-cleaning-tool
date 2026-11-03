@@ -24,14 +24,27 @@ OUT = ROOT / "test-results"
 SOURCES = ["app.py", "pyproject.toml", "requirements.txt", "src", "tests", "scripts", "data"]
 
 
+def source_files() -> list[Path]:
+    """Files git tracks or would track under SOURCES; ignored build files are left out."""
+    try:
+        out = subprocess.run(
+            ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", *SOURCES],
+            cwd=ROOT, capture_output=True, check=True).stdout
+        return [ROOT / p for p in out.decode("utf-8").split("\0") if p and (ROOT / p).is_file()]
+    except (OSError, subprocess.CalledProcessError):  # not a git checkout: walk, skip build files
+        files: list[Path] = []
+        for s in SOURCES:
+            p = ROOT / s
+            if p.is_file():
+                files.append(p)
+            elif p.is_dir():
+                files += [q for q in p.rglob("*") if q.is_file() and q.suffix != ".pyc" and not any(
+                    part == "__pycache__" or part.endswith(".egg-info") for part in q.parts)]
+        return files
+
+
 def source_digest() -> str:
-    files: list[Path] = []
-    for s in SOURCES:
-        p = ROOT / s
-        if p.is_file():
-            files.append(p)
-        elif p.is_dir():
-            files += [q for q in p.rglob("*") if q.is_file() and "__pycache__" not in q.parts]
+    files = source_files()
     h = hashlib.sha256()
     for f in sorted(files, key=lambda q: q.relative_to(ROOT).as_posix()):
         body = f.read_bytes().replace(b"\r\n", b"\n")  # same digest for CRLF and LF checkouts

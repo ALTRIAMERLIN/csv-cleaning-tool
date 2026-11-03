@@ -119,9 +119,12 @@ st.markdown(
     f"(field count {c['field_count_mismatch_rows']} · invalid {c['invalid_rows']} · "
     f"duplicate {c['duplicate_rows']})"
 )
-ok = "✅" if summary["accounting_ok"] else "❌"
-st.caption(f"{ok} Output check: clean.csv and issues.csv were re-read; each of the "
-           f"{c['input_rows']} input rows appears in exactly one of them.")
+if summary["accounting_ok"]:
+    st.caption(f"✅ Output check passed: clean.csv and issues.csv were re-read; each of the "
+               f"{c['input_rows']} input rows appears in exactly one of them.")
+else:
+    st.error("Output check failed: re-reading clean.csv and issues.csv did not account for "
+             "every input row exactly once. Do not use these files.", icon="❌")
 t_clean, t_issues, t_log, t_sum = st.tabs(
     [f"Clean data ({c['clean_rows']})", f"Issues ({c['issue_rows']})",
      f"Change log ({c['changed_cells']})", "Summary"])
