@@ -3,4 +3,5 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 out/
+!video/out/
 node_modules/
