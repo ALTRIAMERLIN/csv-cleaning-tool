@@ -6,6 +6,7 @@
     "data": "python scripts/make_data.py",
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts CsvCleanDemo out/csv-cleaning-tool-demo.mp4 --codec h264 --crf 18 --concurrency 2",
+    "cover": "remotion still src/index.ts CsvCleanCover ../deliverables/cover.png",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

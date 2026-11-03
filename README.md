@@ -194,6 +194,8 @@ Remotion is free for individuals and small companies; see its
 
 ## Documentation
 
+- Delivery check, implemented features, limits and what was not verified:
+  [docs/DELIVERY.md](docs/DELIVERY.md)
 - Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
 - Acceptance cases and their status: [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)
 - Latest saved test run: [test-results/run_info.json](test-results/run_info.json)
@@ -238,6 +240,7 @@ scripts/record_demo.py     records the demo run and writes demo/demo_manifest.js
 data/                      demo input, demo rules, expected results
 demo/                      the recorded run: video, screenshots, downloads, manifest
 video/                     Remotion source and the final demo video (video/out/)
+deliverables/              portfolio cover, three screenshots, Upwork text
 docs/                      requirements, acceptance cases, Chinese quick start
 test-results/              latest saved test run
 ```
