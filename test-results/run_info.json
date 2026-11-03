@@ -5,7 +5,7 @@
   "os": "Windows 10",
   "result": "42 passed in 1.13s",
   "exit_code": 0,
-  "source_sha256": "cb65ac20323f7ba68e505452dfda23caddb2b0f0c942a23a6cbee4f3081a107a",
+  "source_sha256": "7ef699c38c8c28b3faa348d2682083235909a926290a79946635f9852d74f2d9",
   "source_paths": [
     "app.py",
     "pyproject.toml",

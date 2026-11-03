@@ -1,5 +1,5 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- <local>\.venv\Scripts\python.exe
+platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- <local>\Scripts\python.exe
 rootdir: <local>
 configfile: pyproject.toml
 testpaths: tests

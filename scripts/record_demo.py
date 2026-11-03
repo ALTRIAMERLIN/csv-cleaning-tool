@@ -288,7 +288,8 @@ def main() -> int:
     if DEMO.exists() and "--force" not in sys.argv:
         print("demo/ already exists; pass --force to record again", file=sys.stderr)
         return 2
-    commit, dirty = git("rev-parse", "HEAD"), git("status", "--porcelain") != ""
+    commit = git("rev-parse", "HEAD")
+    dirty = git("status", "--porcelain", "--", ".", ":(exclude)demo") != ""  # demo/ is our output
     if dirty:
         print("refusing to record: commit your changes first, so the manifest names the "
               "exact program version", file=sys.stderr)
