@@ -32,5 +32,13 @@ Each case maps to at least one automated test in `tests/`. Status is filled from
 | AC-26 | CLI = core | same file via CLI and core API | demo rules | identical outputs | `test_cli_matches_core` | pass (pytest, 2026-11-03) |
 | AC-27 | Summary has no paths/time | any | any | `summary.json` has file name only, no timestamp | `test_summary_no_paths` | pass (pytest, 2026-11-03) |
 
-UI acceptance (manual, recorded): upload → preview → rules → run → view tabs → download →
-downloaded files match CLI outputs by SHA-256. Status: not run.
+## UI acceptance
+
+| ID | Case | How | Status |
+|---|---|---|---|
+| UI-01 | Page loads, asks for input | `tests/test_app.py::test_ui_waits_for_input` (Streamlit AppTest) | pass (pytest, 2026-11-03) |
+| UI-02 | Sample → demo rules → run shows expected counts and ✅ accounting | `tests/test_app.py::test_ui_full_flow_matches_expected` | pass (pytest, 2026-11-03) |
+| UI-03 | Changing rules after a run shows a "Rules changed" warning | `tests/test_app.py::test_ui_rules_change_warns` | pass (pytest, 2026-11-03) |
+| UI-04 | Real browser (Edge): upload file → preview → set rules → run → Issues tab → download 4 files; each download is byte-identical to the core output | `scripts/ui_check.py` against a running app | pass (2026-11-03: 4/4 MATCH, counts 191 = 165 + 26) |
+
+UI-04 is not part of `pytest`; it needs the app running. Re-run before recording.

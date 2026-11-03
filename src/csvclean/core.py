@@ -130,16 +130,22 @@ def _raw_record(fields: list[str]) -> str:
     return buf.getvalue()
 
 
-def process(data: bytes, rules: Rules, input_name: str) -> Result:
-    """Run read -> structure check -> trim -> validate -> dedupe. No file I/O."""
+def read_table(data: bytes) -> tuple[list[str], list[list[str]]]:
+    """Decode and parse. Returns (header, data records). Used by process() and the UI preview."""
     text = _decode(data)
-    reader = csv.reader(io.StringIO(text, newline=""))
     try:
-        records = list(reader)
+        records = list(csv.reader(io.StringIO(text, newline="")))
     except csv.Error as e:
         raise HeaderError(f"CSV could not be parsed: {e}") from None
     header = records[0]
     _check_header(header)
+    return header, records[1:]
+
+
+def process(data: bytes, rules: Rules, input_name: str) -> Result:
+    """Run read -> structure check -> trim -> validate -> dedupe. No file I/O."""
+    header, body = read_table(data)
+    records = [header, *body]
     _check_rules(rules, header)
 
     trim_set = set(rules.trim_columns)

@@ -1,3 +1,5 @@
 # Core uses only the Python standard library.
 streamlit>=1.38
 pytest>=8
+# Only for scripts/ui_check.py (real-browser check and screen recording); uses installed Edge.
+playwright>=1.45
