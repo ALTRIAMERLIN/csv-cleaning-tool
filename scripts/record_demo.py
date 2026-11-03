@@ -165,10 +165,10 @@ class Demo:
         inp = box.locator("input")
         self.click(inp)
         for v in values:
-            inp.press_sequentially(v, delay=85)
-            self.pause(350)
+            inp.press_sequentially(v, delay=60)
+            self.pause(250)
             inp.press("Enter")
-            self.pause(450)
+            self.pause(300)
         self.page.keyboard.press("Escape")
         missing = [v for v in values if v not in box.inner_text()]
         if missing:
@@ -252,7 +252,7 @@ def run_demo(url: str, frames_dir: Path, downloads: Path) -> dict:
             dl.value.save_as(str(downloads / name))
             d.mark(f"downloaded {name}")
             d.pause(900)
-        d.glide(page.locator('[data-testid="stDataFrame"]').last)
+        d.glide(page.get_by_text("Check a download with its SHA-256 below."))  # keep data uncovered
         d.mark("SHA-256 table")
         d.pause(1000)
         d.shot("06_downloads.png")

@@ -3,9 +3,9 @@
   "csvclean_version": "0.1.0",
   "python": "3.11.9",
   "os": "Windows 10",
-  "result": "42 passed in 1.14s",
+  "result": "42 passed in 1.13s",
   "exit_code": 0,
-  "source_sha256": "cfeb7c7d89acf57814fbd9799d2909a7997a1f2339dc9bb1c32e37610672abd9",
+  "source_sha256": "cb65ac20323f7ba68e505452dfda23caddb2b0f0c942a23a6cbee4f3081a107a",
   "source_paths": [
     "app.py",
     "pyproject.toml",
