@@ -50,4 +50,4 @@ tests/test_skeleton.py::test_package_imports PASSED                      [ 97%]
 tests/test_skeleton.py::test_cli_parser PASSED                           [100%]
 
 - generated xml file: <local>\test-results\junit.xml -
-============================= 42 passed in 1.16s ==============================
+============================= 42 passed in 1.03s ==============================
