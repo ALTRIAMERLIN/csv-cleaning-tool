@@ -1,0 +1,59 @@
+{
+  "tool": "csvclean",
+  "version": "0.1.0",
+  "input_file": "demo_customers.csv",
+  "input_sha256": "8bc7170b53a7d1825ec321b3dbf36a0b3826a5830e8992b096171f9f1bf4fc1e",
+  "input_bytes": 14579,
+  "trailing_blank_lines_ignored": 0,
+  "columns": [
+    "customer_id",
+    "name",
+    "email",
+    "phone",
+    "signup_date",
+    "city",
+    "notes"
+  ],
+  "rules": {
+    "trim_columns": [
+      "name",
+      "email",
+      "city"
+    ],
+    "required_columns": [
+      "customer_id",
+      "name",
+      "email"
+    ],
+    "email_columns": [
+      "email"
+    ],
+    "dedupe_keys": [
+      "email"
+    ],
+    "dedupe_keep": "first"
+  },
+  "counts": {
+    "input_rows": 191,
+    "clean_rows": 165,
+    "issue_rows": 26,
+    "field_count_mismatch_rows": 2,
+    "invalid_rows": 16,
+    "duplicate_rows": 8,
+    "changed_cells": 25
+  },
+  "reason_counts": {
+    "duplicate": 8,
+    "field_count_mismatch": 2,
+    "invalid_email:email": 9,
+    "missing_required:email": 2,
+    "missing_required:name": 7
+  },
+  "outputs": [
+    "clean.csv",
+    "issues.csv",
+    "changes.csv",
+    "summary.json"
+  ],
+  "accounting_ok": true
+}

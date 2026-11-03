@@ -142,6 +142,28 @@ python scripts/ui_check.py out/ui_check --start-app   # real browser run (needs 
 demo rules, runs, downloads the four files, and compares each download byte for byte with the
 core output.
 
+## Demo recording
+
+`python scripts/record_demo.py` records one complete run of the real local page in Microsoft
+Edge, driven by Playwright at 1920x1080: upload → preview → rules → run → clean data, issues,
+change log and summary → download. Every frame the browser paints is captured and encoded at
+its real timing. Afterwards the script compares the downloaded files with the core output and
+with a separate command-line run.
+
+The recorded run is in `demo/`:
+
+| Path | Content |
+|---|---|
+| `demo/recording/raw_recording.mp4` | The complete recording (59.5 s), no cuts and no speed changes |
+| `demo/screens/` | Six screenshots taken during the run |
+| `demo/outputs/` | The four downloaded files |
+| `demo/demo_manifest.json` | Program version and git commit, input hash, rules, timeline, output hashes, counts and checks |
+
+A small cursor marker is injected into the page so viewers can see where the script points
+and clicks. Nothing else on the page is changed.
+
+## Documentation
+
 - Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
 - Acceptance cases and their status: [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md)
 - Latest saved test run: [test-results/run_info.json](test-results/run_info.json)
@@ -182,7 +204,9 @@ tests/                     pytest tests (core, CLI and Streamlit AppTest)
 scripts/generate_data.py   synthetic data and expected results
 scripts/run_tests.py       runs the tests, saves results without local paths
 scripts/ui_check.py        real-browser check in Microsoft Edge
+scripts/record_demo.py     records the demo run and writes demo/demo_manifest.json
 data/                      demo input, demo rules, expected results
+demo/                      the recorded run: video, screenshots, downloads, manifest
 docs/                      requirements, acceptance cases, Chinese quick start
 test-results/              latest saved test run
 ```

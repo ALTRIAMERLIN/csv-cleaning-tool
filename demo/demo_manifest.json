@@ -1,0 +1,233 @@
+{
+  "project": "CSV Data Cleaning & Validation Tool",
+  "label": "Personal demo, synthetic data",
+  "recorded_utc": "2026-11-03T05:32:40Z",
+  "program": {
+    "csvclean_version": "0.1.0",
+    "git_commit": "59d9b9655bd0bc79fc70229196248b081e5dc084",
+    "working_tree_clean": true,
+    "python": "3.11.9",
+    "streamlit": "1.66.1",
+    "playwright": "1.64.1",
+    "browser": "Microsoft Edge 156.0.4314.58 (headless)",
+    "os": "Windows 10"
+  },
+  "input": {
+    "file": "data/demo_customers.csv",
+    "bytes": 14579,
+    "sha256": "8bc7170b53a7d1825ec321b3dbf36a0b3826a5830e8992b096171f9f1bf4fc1e",
+    "generator": "scripts/generate_data.py",
+    "seed": 42
+  },
+  "rules": {
+    "trim_columns": [
+      "name",
+      "email",
+      "city"
+    ],
+    "required_columns": [
+      "customer_id",
+      "name",
+      "email"
+    ],
+    "email_columns": [
+      "email"
+    ],
+    "dedupe_keys": [
+      "email"
+    ],
+    "dedupe_keep": "first"
+  },
+  "recording": {
+    "raw_file": "demo/recording/raw_recording.mp4",
+    "bytes": 3324158,
+    "sha256": "a995cec6f692850ea5e1142d3d78d5eb8dbdb9bccd9cd6f47eb1bb6a7c34b280",
+    "width": 1920,
+    "height": 1080,
+    "fps": "30/1",
+    "frames": 1786,
+    "duration_s": 59.53,
+    "codec": "H.264, no audio",
+    "captured_frames": 881,
+    "captured_span_s": 59.47,
+    "how": "Real local Streamlit page (127.0.0.1) in Microsoft Edge, driven by scripts/record_demo.py with Playwright. Every painted frame was captured with the DevTools screencast (JPEG quality 92) and encoded by ffmpeg at its real timestamp. Complete run: no cuts, no speed changes.",
+    "page_changes": "A cursor marker was injected to show where the script points and clicks. It is hidden while screenshots are taken, so it blinks off briefly in the video. Nothing else changed.",
+    "timeline_note": "t = seconds from the first recorded frame",
+    "timeline": [
+      {
+        "t": 0.99,
+        "event": "page ready (empty, waiting for upload)"
+      },
+      {
+        "t": 3.4,
+        "event": "upload: Upload button clicked, file chosen"
+      },
+      {
+        "t": 4.23,
+        "event": "preview shown"
+      },
+      {
+        "t": 9.46,
+        "event": "screenshot 01_preview.png"
+      },
+      {
+        "t": 10.64,
+        "event": "preview table scrolled"
+      },
+      {
+        "t": 13.25,
+        "event": "rules section"
+      },
+      {
+        "t": 17.25,
+        "event": "rule set: Trim leading/trailing spaces = name, email, city"
+      },
+      {
+        "t": 21.49,
+        "event": "rule set: Required = customer_id, name, email"
+      },
+      {
+        "t": 23.4,
+        "event": "rule set: Email format check = email"
+      },
+      {
+        "t": 25.3,
+        "event": "rule set: Remove duplicates by = email"
+      },
+      {
+        "t": 26.2,
+        "event": "keep = first occurrence (default, left unchanged)"
+      },
+      {
+        "t": 27.26,
+        "event": "screenshot 02_rules.png"
+      },
+      {
+        "t": 27.7,
+        "event": "run clicked"
+      },
+      {
+        "t": 27.84,
+        "event": "results shown"
+      },
+      {
+        "t": 32.63,
+        "event": "screenshot 03_results.png"
+      },
+      {
+        "t": 33.05,
+        "event": "tab: clean data"
+      },
+      {
+        "t": 35.27,
+        "event": "tab: issues"
+      },
+      {
+        "t": 37.15,
+        "event": "screenshot 04_issues.png"
+      },
+      {
+        "t": 39.98,
+        "event": "tab: change log"
+      },
+      {
+        "t": 41.83,
+        "event": "screenshot 05_change_log.png"
+      },
+      {
+        "t": 43.07,
+        "event": "tab: summary"
+      },
+      {
+        "t": 48.54,
+        "event": "download section"
+      },
+      {
+        "t": 50.54,
+        "event": "downloaded clean.csv"
+      },
+      {
+        "t": 51.89,
+        "event": "downloaded issues.csv"
+      },
+      {
+        "t": 53.24,
+        "event": "downloaded changes.csv"
+      },
+      {
+        "t": 54.6,
+        "event": "downloaded summary.json"
+      },
+      {
+        "t": 55.9,
+        "event": "SHA-256 table"
+      },
+      {
+        "t": 56.96,
+        "event": "screenshot 06_downloads.png"
+      },
+      {
+        "t": 59.47,
+        "event": "end"
+      }
+    ]
+  },
+  "screenshots": [
+    "demo/screens/01_preview.png",
+    "demo/screens/02_rules.png",
+    "demo/screens/03_results.png",
+    "demo/screens/04_issues.png",
+    "demo/screens/05_change_log.png",
+    "demo/screens/06_downloads.png"
+  ],
+  "outputs": {
+    "clean.csv": {
+      "file": "demo/outputs/clean.csv",
+      "bytes": 13339,
+      "sha256": "de3f148edb21033a0a62ecc42df1716e1dc14e263975baa0bd435a89009ddb01",
+      "rows": 165
+    },
+    "issues.csv": {
+      "file": "demo/outputs/issues.csv",
+      "bytes": 2536,
+      "sha256": "5ed9cf275dd006e1a5528aeda5546edce5a1c1fc02038847e2030bbfbf16dfe8",
+      "rows": 26
+    },
+    "changes.csv": {
+      "file": "demo/outputs/changes.csv",
+      "bytes": 1025,
+      "sha256": "8630a681077d047348a92668d54a52b63470221b60f351a0922594f1d6bf33c2",
+      "rows": 25
+    },
+    "summary.json": {
+      "file": "demo/outputs/summary.json",
+      "bytes": 1121,
+      "sha256": "c386a3d5ba92eb239ceef947c56e2b60849aca13a4e8695aac662c34489c39bc"
+    }
+  },
+  "counts": {
+    "input_rows": 191,
+    "clean_rows": 165,
+    "issue_rows": 26,
+    "field_count_mismatch_rows": 2,
+    "invalid_rows": 16,
+    "duplicate_rows": 8,
+    "changed_cells": 25
+  },
+  "reason_counts": {
+    "duplicate": 8,
+    "field_count_mismatch": 2,
+    "invalid_email:email": 9,
+    "missing_required:email": 2,
+    "missing_required:name": 7
+  },
+  "trailing_blank_lines_ignored": 0,
+  "checks": {
+    "downloads_match_core_output": true,
+    "downloads_match_cli_output": true,
+    "counts_match_expected": true,
+    "reason_counts_match_expected": true,
+    "accounting_ok": true,
+    "input_sha256_matches_file": true
+  }
+}

@@ -54,6 +54,7 @@ results still match the current sources.
 | UI-02 | Sample → demo rules → run shows expected counts and the ✅ output check | `tests/test_app.py::test_ui_full_flow_matches_expected` | pass (pytest, 2026-11-03) |
 | UI-03 | Changing rules after a run shows a "Rules changed" warning | `tests/test_app.py::test_ui_rules_change_warns` | pass (pytest, 2026-11-03) |
 | UI-05 | A failed output check reads as a failure (no "passed" wording) | `tests/test_app.py::test_ui_failed_check_says_failed` (check forced to fail) | pass (pytest, 2026-11-03) |
+| UI-06 | Recorded demo run: upload → preview → rules → run → all four tabs → download four files; downloads identical to the core output and to a separate CLI run; counts and reason counts equal `data/expected` | `python scripts/record_demo.py` → `checks` in `demo/demo_manifest.json` | pass (2026-11-03: all 6 checks true, 59.5 s recording) |
 | UI-04 | Real browser (Edge): upload file → preview → set rules → run → Issues tab → download 4 files; each download is byte-identical to the core output | `python scripts/ui_check.py OUT --start-app` | pass (2026-11-03, re-run after review fixes: 4/4 MATCH, counts 191 = 165 + 26) |
 
 UI-04 is not part of `pytest`. With `--start-app` the script starts the app on a free

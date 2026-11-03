@@ -1,0 +1,29 @@
+﻿source_row,reasons,customer_id,name,email,phone,signup_date,city,notes,raw_record
+4,invalid_email:email,C0004,Nora Muller,no-at-sign.example.com,N/A,2025-04-03,Toronto,"Line one
+Line two",
+5,missing_required:email,C0005,Kofi Rossi,,0005 555 005,4 Mar 2025,Lisbon,,
+7,invalid_email:email,C0007,Omar Novak,two words@example.com,,2025-04-03,Nairobi,"Said ""call after 5pm""",
+23,duplicate_of:12,C0902,Hiro Chen,customer012@example.org,,4 Mar 2025,Nairobi,VIP,
+28,duplicate_of:8,C0906,Tara Kim,customer008@example.net,0008 555 008,,Lisbon,,
+31,invalid_email:email,C0029,Rosa Muller,user@,0029 555 029,2025-04-03,Lisbon,,
+36,missing_required:name,C0034,,customer034@example.com,0034 555 034,03/04/2025,Austin,备注：老客户,
+40,missing_required:name,C0038,,customer038@example.com,,2025-04-03,Zürich,"Said ""call after 5pm""",
+47,missing_required:name,C0045,,customer045@example.org,,03/04/2025,Osaka,Café owner ☕,
+63,invalid_email:email,C0061,Mateo Kim,user@exa mple.com,+1 555 0161,4 Mar 2025,São Paulo,备注：老客户,
+67,missing_required:name,C0065,,customer065@example.com,0065 555 065,4 Mar 2025,Zürich,,
+83,duplicate_of:80,C0904,Rosa Silva,customer078@example.com,,2025/03/04,Osaka,VIP,
+86,missing_required:name;invalid_email:email,C0083,,broken@,,20250304,Berlin,N/A,
+95,invalid_email:email,C0092,Hiro Muller,user@example,0092 555 092,03/04/2025,Toronto,Café owner ☕,
+97,duplicate_of:16,C0907,Ines Haddad,customer016@example.org,,4 Mar 2025,Austin,,
+111,field_count_mismatch,,,,,,,,"C0990,Extra Field,x990@example.com,,,Berlin,,EXTRA"
+113,duplicate_of:59,C0901,Lena Novak,customer057@example.org,0057 555 057,03/04/2025,Toronto,,
+140,duplicate_of:135,C0900,Sven Smith,customer129@example.com,,20250304,上海,"Said ""call after 5pm""",
+146,missing_required:name,C0139,,customer139@example.net,0139 555 139,2025/03/04,Osaka,备注：老客户,
+148,field_count_mismatch,,,,,,,,"C0991,Short Row,x991@example.com"
+159,missing_required:name;invalid_email:email,C0151,,broken@,N/A,03/04/2025,Lisbon,"Line one
+Line two",
+171,duplicate_of:141,C0903,Alice Novak,customer134@example.org,,2025-04-03,Austin,备注：老客户,
+180,invalid_email:email,C0170,Mateo Kim,@example.com,0170 555 170,2025/03/04,Berlin,N/A,
+185,duplicate_of:124,C0905,Tara Haddad,customer118@example.net,0118 555 118,20250304,Zürich,Café owner ☕,
+187,missing_required:email,C0176,Grace Silva,,0176 555 176,4 Mar 2025,Lisbon,"Prefers email, not phone",
+190,invalid_email:email,C0179,Kofi Muller,a@@example.com,0179 555 179,2025-04-03,Nairobi,VIP,

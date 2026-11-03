@@ -1,0 +1,26 @@
+﻿source_row,column,action,old_value,new_value
+5,email,trim,  ,
+14,city,trim, 上海 ,上海
+17,city,trim, Toronto,Toronto
+23,email,trim, customer012@example.org ,customer012@example.org
+28,email,trim, customer008@example.net ,customer008@example.net
+30,city,trim,	Berlin,Berlin
+32,name,trim, Hiro Garcia ,Hiro Garcia
+35,email,trim, customer033@example.org ,customer033@example.org
+36,name,trim,   ,
+40,name,trim,   ,
+47,name,trim,   ,
+67,name,trim,   ,
+70,email,trim,  customer068@example.org,customer068@example.org
+83,email,trim, customer078@example.com ,customer078@example.com
+96,email,trim, customer093@example.com,customer093@example.com
+114,city,trim,	上海 ,上海
+121,name,trim,  Kofi Chen ,Kofi Chen
+122,city,trim,	Toronto ,Toronto
+128,name,trim,  Omar Haddad,Omar Haddad
+138,email,trim,	customer132@example.net ,customer132@example.net
+140,email,trim, customer129@example.com ,customer129@example.com
+142,city,trim,	上海 ,上海
+146,name,trim,   ,
+160,name,trim, David Garcia ,David Garcia
+187,email,trim,  ,
