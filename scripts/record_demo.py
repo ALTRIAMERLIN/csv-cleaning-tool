@@ -193,8 +193,8 @@ def run_demo(url: str, frames_dir: Path, downloads: Path) -> dict:
         d.pause(2000)
 
         with page.expect_file_chooser() as fc:
-            d.click(page.get_by_role("button", name="Browse files"))
-        d.mark("upload: Browse files clicked")
+            d.click(page.locator('[data-testid="stFileUploader"] button').first)
+        d.mark("upload: Upload button clicked, file chosen")
         fc.value.set_files(str(CSV))
         page.get_by_text("Data rows").wait_for()
         d.mark("preview shown")
