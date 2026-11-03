@@ -1,0 +1,21 @@
+{
+  "name": "csvclean-demo-video",
+  "private": true,
+  "description": "Remotion source for the CSV Data Cleaning & Validation Tool demo video",
+  "scripts": {
+    "data": "python scripts/make_data.py",
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts CsvCleanDemo out/csv-cleaning-tool-demo.mp4 --codec h264 --crf 18 --concurrency 2",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.540",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.540"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "7.0.2"
+  }
+}

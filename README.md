@@ -162,6 +162,36 @@ The recorded run is in `demo/`:
 A small cursor marker is injected into the page so viewers can see where the script points
 and clicks. Nothing else on the page is changed.
 
+## Demo video
+
+`video/out/csv-cleaning-tool-demo.mp4`: 55 s, 1920x1080, 30 fps, H.264, no audio, English
+captions. It is made with [Remotion](https://www.remotion.dev/) from the recording above.
+
+- The clips come from `demo/recording/raw_recording.mp4` and all play at normal speed. Only
+  the waiting time between steps is cut. `video/src/Demo.tsx` lists each clip's start second
+  in the raw recording.
+- Every number and example row comes from `video/src/demo-data.json`, which
+  `video/scripts/make_data.py` builds from `demo/demo_manifest.json`, the downloaded files in
+  `demo/outputs/`, the input CSV and `test-results/run_info.json`.
+- The opening comparison shows six real rows from the input file and where this run put them.
+  The verification card near the end shows the real checks from the manifest.
+- There are no customers, reviews, time savings, accuracy or speed figures.
+
+Rebuild the video (Node.js 18 or newer):
+
+```bash
+cd video
+npm ci
+python scripts/make_data.py
+npx remotion render src/index.ts CsvCleanDemo out/csv-cleaning-tool-demo.mp4 --codec h264 --crf 18
+```
+
+On first render Remotion downloads its own headless Chrome. This video was rendered with the
+installed Microsoft Edge instead, by adding
+`--browser-executable="C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" --chrome-mode=chrome-for-testing`.
+Remotion is free for individuals and small companies; see its
+[license](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+
 ## Documentation
 
 - Spec: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
@@ -207,6 +237,7 @@ scripts/ui_check.py        real-browser check in Microsoft Edge
 scripts/record_demo.py     records the demo run and writes demo/demo_manifest.json
 data/                      demo input, demo rules, expected results
 demo/                      the recorded run: video, screenshots, downloads, manifest
+video/                     Remotion source and the final demo video (video/out/)
 docs/                      requirements, acceptance cases, Chinese quick start
 test-results/              latest saved test run
 ```

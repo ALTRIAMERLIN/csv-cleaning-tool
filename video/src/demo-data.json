@@ -1,0 +1,304 @@
+{
+  "source": {
+    "manifest_sha256": "4080bfcc01e19e9239b7b9a2a2a6404aee896924d5f74ae3f19087f44a0a5eaf",
+    "recorded_utc": "2026-11-03T05:32:40Z",
+    "program_commit": "59d9b96",
+    "csvclean_version": "0.1.0",
+    "browser": "Microsoft Edge 156.0.4314.58 (headless)"
+  },
+  "input": {
+    "file": "demo_customers.csv",
+    "rows": 191,
+    "columns": 7
+  },
+  "rules": {
+    "trim_columns": [
+      "name",
+      "email",
+      "city"
+    ],
+    "required_columns": [
+      "customer_id",
+      "name",
+      "email"
+    ],
+    "email_columns": [
+      "email"
+    ],
+    "dedupe_keys": [
+      "email"
+    ],
+    "dedupe_keep": "first"
+  },
+  "counts": {
+    "input_rows": 191,
+    "clean_rows": 165,
+    "issue_rows": 26,
+    "field_count_mismatch_rows": 2,
+    "invalid_rows": 16,
+    "duplicate_rows": 8,
+    "changed_cells": 25
+  },
+  "reason_counts": {
+    "duplicate": 8,
+    "field_count_mismatch": 2,
+    "invalid_email:email": 9,
+    "missing_required:email": 2,
+    "missing_required:name": 7
+  },
+  "outputs": {
+    "clean.csv": {
+      "file": "demo/outputs/clean.csv",
+      "bytes": 13339,
+      "sha256": "de3f148edb21033a0a62ecc42df1716e1dc14e263975baa0bd435a89009ddb01",
+      "rows": 165
+    },
+    "issues.csv": {
+      "file": "demo/outputs/issues.csv",
+      "bytes": 2536,
+      "sha256": "5ed9cf275dd006e1a5528aeda5546edce5a1c1fc02038847e2030bbfbf16dfe8",
+      "rows": 26
+    },
+    "changes.csv": {
+      "file": "demo/outputs/changes.csv",
+      "bytes": 1025,
+      "sha256": "8630a681077d047348a92668d54a52b63470221b60f351a0922594f1d6bf33c2",
+      "rows": 25
+    },
+    "summary.json": {
+      "file": "demo/outputs/summary.json",
+      "bytes": 1121,
+      "sha256": "c386a3d5ba92eb239ceef947c56e2b60849aca13a4e8695aac662c34489c39bc"
+    }
+  },
+  "checks": {
+    "downloads_match_core_output": true,
+    "downloads_match_cli_output": true,
+    "counts_match_expected": true,
+    "reason_counts_match_expected": true,
+    "accounting_ok": true,
+    "input_sha256_matches_file": true
+  },
+  "recording": {
+    "raw_file": "demo/recording/raw_recording.mp4",
+    "duration_s": 59.53,
+    "width": 1920,
+    "height": 1080,
+    "timeline": [
+      {
+        "t": 0.99,
+        "event": "page ready (empty, waiting for upload)"
+      },
+      {
+        "t": 3.4,
+        "event": "upload: Upload button clicked, file chosen"
+      },
+      {
+        "t": 4.23,
+        "event": "preview shown"
+      },
+      {
+        "t": 9.46,
+        "event": "screenshot 01_preview.png"
+      },
+      {
+        "t": 10.64,
+        "event": "preview table scrolled"
+      },
+      {
+        "t": 13.25,
+        "event": "rules section"
+      },
+      {
+        "t": 17.25,
+        "event": "rule set: Trim leading/trailing spaces = name, email, city"
+      },
+      {
+        "t": 21.49,
+        "event": "rule set: Required = customer_id, name, email"
+      },
+      {
+        "t": 23.4,
+        "event": "rule set: Email format check = email"
+      },
+      {
+        "t": 25.3,
+        "event": "rule set: Remove duplicates by = email"
+      },
+      {
+        "t": 26.2,
+        "event": "keep = first occurrence (default, left unchanged)"
+      },
+      {
+        "t": 27.26,
+        "event": "screenshot 02_rules.png"
+      },
+      {
+        "t": 27.7,
+        "event": "run clicked"
+      },
+      {
+        "t": 27.84,
+        "event": "results shown"
+      },
+      {
+        "t": 32.63,
+        "event": "screenshot 03_results.png"
+      },
+      {
+        "t": 33.05,
+        "event": "tab: clean data"
+      },
+      {
+        "t": 35.27,
+        "event": "tab: issues"
+      },
+      {
+        "t": 37.15,
+        "event": "screenshot 04_issues.png"
+      },
+      {
+        "t": 39.98,
+        "event": "tab: change log"
+      },
+      {
+        "t": 41.83,
+        "event": "screenshot 05_change_log.png"
+      },
+      {
+        "t": 43.07,
+        "event": "tab: summary"
+      },
+      {
+        "t": 48.54,
+        "event": "download section"
+      },
+      {
+        "t": 50.54,
+        "event": "downloaded clean.csv"
+      },
+      {
+        "t": 51.89,
+        "event": "downloaded issues.csv"
+      },
+      {
+        "t": 53.24,
+        "event": "downloaded changes.csv"
+      },
+      {
+        "t": 54.6,
+        "event": "downloaded summary.json"
+      },
+      {
+        "t": 55.9,
+        "event": "SHA-256 table"
+      },
+      {
+        "t": 56.96,
+        "event": "screenshot 06_downloads.png"
+      },
+      {
+        "t": 59.47,
+        "event": "end"
+      }
+    ]
+  },
+  "tests": "42 passed in 1.13s",
+  "examples": [
+    {
+      "kind": "bad_email",
+      "source_row": 4,
+      "input": {
+        "customer_id": "C0004",
+        "name": "Nora Muller",
+        "email": "no-at-sign.example.com",
+        "city": "Toronto"
+      },
+      "raw_record": null,
+      "dest": "issues.csv",
+      "after": null,
+      "reason": "invalid_email:email"
+    },
+    {
+      "kind": "unchanged",
+      "source_row": 9,
+      "input": {
+        "customer_id": "C0009",
+        "name": "刘洋",
+        "email": "customer009@example.org",
+        "city": "Lisbon"
+      },
+      "raw_record": null,
+      "dest": "clean.csv",
+      "after": {
+        "customer_id": "C0009",
+        "name": "刘洋",
+        "email": "customer009@example.org",
+        "city": "Lisbon"
+      },
+      "reason": null
+    },
+    {
+      "kind": "duplicate",
+      "source_row": 23,
+      "input": {
+        "customer_id": "C0902",
+        "name": "Hiro Chen",
+        "email": " customer012@example.org ",
+        "city": "Nairobi"
+      },
+      "raw_record": null,
+      "dest": "issues.csv",
+      "after": null,
+      "reason": "duplicate_of:12"
+    },
+    {
+      "kind": "trimmed",
+      "source_row": 32,
+      "input": {
+        "customer_id": "C0030",
+        "name": " Hiro Garcia ",
+        "email": "customer030@example.com",
+        "city": "Nairobi"
+      },
+      "raw_record": null,
+      "dest": "clean.csv",
+      "after": {
+        "customer_id": "C0030",
+        "name": "Hiro Garcia",
+        "email": "customer030@example.com",
+        "city": "Nairobi"
+      },
+      "reason": null
+    },
+    {
+      "kind": "missing",
+      "source_row": 36,
+      "input": {
+        "customer_id": "C0034",
+        "name": "   ",
+        "email": "customer034@example.com",
+        "city": "Austin"
+      },
+      "raw_record": null,
+      "dest": "issues.csv",
+      "after": null,
+      "reason": "missing_required:name"
+    },
+    {
+      "kind": "broken",
+      "source_row": 111,
+      "input": null,
+      "raw_record": "C0990,Extra Field,x990@example.com,,,Berlin,,EXTRA",
+      "dest": "issues.csv",
+      "after": null,
+      "reason": "field_count_mismatch"
+    }
+  ],
+  "shown_columns": [
+    "customer_id",
+    "name",
+    "email",
+    "city"
+  ]
+}
