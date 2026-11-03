@@ -1,0 +1,19 @@
+{
+  "trim_columns": [
+    "name",
+    "email",
+    "city"
+  ],
+  "required_columns": [
+    "customer_id",
+    "name",
+    "email"
+  ],
+  "email_columns": [
+    "email"
+  ],
+  "dedupe_keys": [
+    "email"
+  ],
+  "dedupe_keep": "first"
+}

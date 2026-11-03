@@ -1,0 +1,47 @@
+{
+  "seed": 42,
+  "counts": {
+    "input_rows": 191,
+    "clean_rows": 165,
+    "issue_rows": 26,
+    "field_count_mismatch_rows": 2,
+    "invalid_rows": 16,
+    "duplicate_rows": 8,
+    "changed_cells": 25
+  },
+  "reason_counts": {
+    "duplicate": 8,
+    "field_count_mismatch": 2,
+    "invalid_email:email": 9,
+    "missing_required:email": 2,
+    "missing_required:name": 7
+  },
+  "issues": {
+    "4": "invalid_email:email",
+    "5": "missing_required:email",
+    "7": "invalid_email:email",
+    "23": "duplicate_of:12",
+    "28": "duplicate_of:8",
+    "31": "invalid_email:email",
+    "36": "missing_required:name",
+    "40": "missing_required:name",
+    "47": "missing_required:name",
+    "63": "invalid_email:email",
+    "67": "missing_required:name",
+    "83": "duplicate_of:80",
+    "86": "missing_required:name;invalid_email:email",
+    "95": "invalid_email:email",
+    "97": "duplicate_of:16",
+    "111": "field_count_mismatch",
+    "113": "duplicate_of:59",
+    "140": "duplicate_of:135",
+    "146": "missing_required:name",
+    "148": "field_count_mismatch",
+    "159": "missing_required:name;invalid_email:email",
+    "171": "duplicate_of:141",
+    "180": "invalid_email:email",
+    "185": "duplicate_of:124",
+    "187": "missing_required:email",
+    "190": "invalid_email:email"
+  }
+}

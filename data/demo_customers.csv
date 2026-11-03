@@ -1,0 +1,212 @@
+customer_id,name,email,phone,signup_date,city,notes
+C0001,David Smith,customer001@example.net,N/A,03/04/2025,Austin,
+C0002,David Novak,customer002@example.com,,2025-04-03,Berlin,
+C0003,Grace Muller,customer003@example.net,+1 555 0103,20250304,Austin,备注：老客户
+C0004,Nora Muller,no-at-sign.example.com,N/A,2025-04-03,Toronto,"Line one
+Line two"
+C0005,Kofi Rossi,  ,0005 555 005,4 Mar 2025,Lisbon,
+C0006,Mateo Garcia,customer006@example.org,N/A,20250304,Osaka,
+C0007,Omar Novak,two words@example.com,,2025-04-03,Nairobi,"Said ""call after 5pm"""
+C0008,Tara Kim,customer008@example.net,0008 555 008,,Lisbon,
+C0009,刘洋,customer009@example.org,+1 555 0109,03/04/2025,Lisbon,"Line one
+Line two"
+C0010,Ines Silva,customer010@example.net,N/A,03/04/2025,São Paulo,"Prefers email, not phone"
+C0011,Grace Rossi,customer011@example.net,+1 555 0111,20250304,Toronto,备注：老客户
+C0012,Hiro Chen,customer012@example.org,,4 Mar 2025,Nairobi,VIP
+C0013,Kofi Smith,customer013@example.com,+1 555 0113,4 Mar 2025,Zürich,"Said ""call after 5pm"""
+C0014,Carmen Muller,customer014@example.net,N/A,03/04/2025, 上海 ,"Line one
+Line two"
+C0015,Omar Chen,customer015@example.org,0015 555 015,03/04/2025,Nairobi,备注：老客户
+C0016,Ines Haddad,customer016@example.org,,4 Mar 2025,Austin,
+C0017,"Seán O'Brien, Jr.",customer017@example.com,+1 555 0117,2025-04-03, Toronto,
+C0018,赵敏,customer018@example.net,+1 555 0118,2025/03/04,Zürich,N/A
+C0019,Omar Novak,customer019@example.org,+1 555 0119,,Lisbon,备注：老客户
+C0020,Ines Kim,customer020@example.com,N/A,2025/03/04,Toronto,Café owner ☕
+C0021,Alice Rossi,customer021@example.net,0021 555 021,20250304,Lisbon,"Said ""call after 5pm"""
+C0022,Quinn Haddad,customer022@example.com,0022 555 022,4 Mar 2025,Toronto,备注：老客户
+C0902,Hiro Chen, customer012@example.org ,,4 Mar 2025,Nairobi,VIP
+C0023,Quinn Smith,customer023@example.net,N/A,2025/03/04,Berlin,
+C0024,Lena Rossi,customer024@example.com,+1 555 0124,03/04/2025,Lisbon,
+C0025,Priya Garcia,customer025@example.net,0025 555 025,03/04/2025,上海,备注：老客户
+C0026,Farid Rossi,customer026@example.net,,03/04/2025,Nairobi,VIP
+C0906,Tara Kim, customer008@example.net ,0008 555 008,,Lisbon,
+C0027,陈静,customer027@example.org,N/A,2025/03/04,Nairobi,Café owner ☕
+C0028,David Muller,customer028@example.com,+1 555 0128,4 Mar 2025,	Berlin,N/A
+C0029,Rosa Muller,user@,0029 555 029,2025-04-03,Lisbon,
+C0030, Hiro Garcia ,customer030@example.com,N/A,2025-04-03,Nairobi,VIP
+C0031,Ines Silva,customer031@example.com,0031 555 031,,上海,VIP
+C0032,Priya Okafor,customer032@example.com,+1 555 0132,2025-04-03,Zürich,"Prefers email, not phone"
+C0033,Nora Okafor, customer033@example.org ,+1 555 0133,,Lisbon,
+C0034,   ,customer034@example.com,0034 555 034,03/04/2025,Austin,备注：老客户
+C0035,Omar Chen,customer035@example.org,0035 555 035,4 Mar 2025,上海,VIP
+C0036,王芳,customer036@example.org,+1 555 0136,2025-04-03,Nairobi,
+C0037,Carmen Muller,customer037@example.com,,2025/03/04,上海,VIP
+C0038,   ,customer038@example.com,,2025-04-03,Zürich,"Said ""call after 5pm"""
+C0039,Omar Rossi,customer039@example.org,,03/04/2025,Austin,"Said ""call after 5pm"""
+C0040,Grace Smith,customer040@example.net,+1 555 0140,,São Paulo,
+C0041,Bob Haddad,customer041@example.org,0041 555 041,2025-04-03,Nairobi,
+C0042,Farid Garcia,customer042@example.net,+1 555 0142,,Austin,"Line one
+Line two"
+C0043,David Haddad,customer043@example.com,+1 555 0143,20250304,Lisbon,"Line one
+Line two"
+C0044,Sven Haddad,customer044@example.net,N/A,4 Mar 2025,Austin,"Prefers email, not phone"
+C0045,   ,customer045@example.org,,03/04/2025,Osaka,Café owner ☕
+C0046,Kofi Garcia,customer046@example.com,,20250304,Lisbon,
+C0047,Rosa Muller,customer047@example.net,N/A,03/04/2025,São Paulo,
+C0048,Hiro Kim,customer048@example.org,0048 555 048,2025/03/04,Nairobi,"Said ""call after 5pm"""
+C0049,Tara Novak,customer049@example.com,N/A,,Lisbon,
+C0050,Ines Garcia,customer050@example.com,0050 555 050,4 Mar 2025,Osaka,N/A
+C0051,Grace Kim,customer051@example.com,N/A,20250304,上海,"Said ""call after 5pm"""
+C0052,Bob Garcia,customer052@example.net,,4 Mar 2025,Berlin,
+C0053,Kofi Chen,customer053@example.net,N/A,03/04/2025,上海,备注：老客户
+C0054,赵敏,customer054@example.net,+1 555 0154,2025-04-03,Lisbon,
+C0055,Rosa Smith,customer055@example.org,0055 555 055,2025/03/04,Toronto,
+C0056,Jamal Kim,customer056@example.com,N/A,03/04/2025,Austin,
+C0057,Lena Novak,customer057@example.org,0057 555 057,03/04/2025,Toronto,
+C0058,Nora Smith,customer058@example.com,N/A,2025/03/04,Austin,"Said ""call after 5pm"""
+C0059,Farid Garcia,customer059@example.org,+1 555 0159,2025/03/04,Austin,VIP
+C0060,Omar Kim,customer060@example.org,0060 555 060,03/04/2025,Berlin,VIP
+C0061,Mateo Kim,user@exa mple.com,+1 555 0161,4 Mar 2025,São Paulo,备注：老客户
+C0062,Mateo Novak,customer062@example.org,+1 555 0162,2025-04-03,Osaka,
+C0063,陈静,customer063@example.com,+1 555 0163,20250304,Zürich,"Prefers email, not phone"
+C0064,Kofi Okafor,customer064@example.net,+1 555 0164,2025/03/04,Austin,"Said ""call after 5pm"""
+C0065,   ,customer065@example.com,0065 555 065,4 Mar 2025,Zürich,
+C0066,Kofi Haddad,customer066@example.org,+1 555 0166,,Osaka,备注：老客户
+C0067,Jamal Okafor,customer067@example.org,,,Osaka,备注：老客户
+C0068,Elena Muller,  customer068@example.org,,,Toronto,N/A
+C0069,Sven Rossi,customer069@example.org,+1 555 0169,4 Mar 2025,Osaka,VIP
+C0070,Nora Haddad,customer070@example.net,N/A,2025/03/04,上海,Café owner ☕
+C0071,Grace Novak,customer071@example.org,0071 555 071,,Lisbon,"Said ""call after 5pm"""
+C0072,杨磊,customer072@example.com,0072 555 072,,Osaka,VIP
+C0073,Grace Chen,customer073@example.com,+1 555 0173,03/04/2025,上海,N/A
+C0074,Carmen Silva,customer074@example.org,0074 555 074,,Zürich,Café owner ☕
+C0075,Mateo Muller,customer075@example.com,+1 555 0175,2025-04-03,Zürich,VIP
+C0076,Farid Novak,customer076@example.org,+1 555 0176,20250304,Austin,
+C0077,Omar Chen,customer077@example.org,N/A,2025/03/04,Nairobi,"Line one
+Line two"
+C0078,Rosa Silva,customer078@example.com,,2025/03/04,Osaka,VIP
+C0079,Ines Novak,customer079@example.org,0079 555 079,4 Mar 2025,上海,
+C0080,Jamal Muller,customer080@example.org,N/A,4 Mar 2025,Nairobi,
+C0904,Rosa Silva, customer078@example.com ,,2025/03/04,Osaka,VIP
+C0081,李娜,customer081@example.com,0081 555 081,2025/03/04,Toronto,VIP
+C0082,Carmen Okafor,customer082@example.org,N/A,20250304,上海,"Line one
+Line two"
+C0083,,broken@,,20250304,Berlin,N/A
+C0084,Mateo Silva,customer084@example.com,N/A,4 Mar 2025,Zürich,"Line one
+Line two"
+C0085,Rosa Novak,customer085@example.net,0085 555 085,2025/03/04,Austin,"Said ""call after 5pm"""
+C0086,Nora Silva,customer086@example.com,,4 Mar 2025,Zürich,
+C0087,Omar Chen,customer087@example.net,+1 555 0187,2025/03/04,Berlin,
+C0088,Nora Chen,customer088@example.org,0088 555 088,2025-04-03,Osaka,"Line one
+Line two"
+C0089,Kofi Muller,customer089@example.org,N/A,4 Mar 2025,Zürich,"Said ""call after 5pm"""
+C0090,赵敏,customer090@example.org,+1 555 0190,2025/03/04,Berlin,备注：老客户
+C0091,Bob Kim,customer091@example.com,+1 555 0191,,Berlin,
+C0092,Hiro Muller,user@example,0092 555 092,03/04/2025,Toronto,Café owner ☕
+C0093,David Haddad, customer093@example.com,,,Osaka,"Prefers email, not phone"
+C0907,Ines Haddad,customer016@example.org,,4 Mar 2025,Austin,
+C0094,Farid Haddad,customer094@example.net,+1 555 0194,03/04/2025,Osaka,
+C0095,Sven Smith,customer095@example.org,,2025/03/04,Austin,
+C0096,Sven Muller,customer096@example.com,N/A,,Lisbon,N/A
+C0097,Bob Kim,customer097@example.net,,,São Paulo,
+C0098,Quinn Kim,customer098@example.com,,2025/03/04,Lisbon,"Line one
+Line two"
+C0099,杨磊,customer099@example.net,,,Toronto,"Line one
+Line two"
+C0100,Farid Novak,customer100@example.net,N/A,20250304,Nairobi,Café owner ☕
+C0101,Omar Okafor,customer101@example.net,N/A,4 Mar 2025,Austin,
+C0102,Ines Silva,customer102@example.com,,20250304,Zürich,"Prefers email, not phone"
+C0103,Alice Silva,customer103@example.org,0103 555 103,2025/03/04,Austin,"Prefers email, not phone"
+C0104,Ines Kim,customer104@example.org,N/A,20250304,Berlin,备注：老客户
+C0105,Grace Garcia,customer105@example.com,,2025/03/04,Nairobi,VIP
+C0106,Priya Silva,customer106@example.org,+1 555 0106,2025-04-03,Osaka,VIP
+C0990,Extra Field,x990@example.com,,,Berlin,,EXTRA
+C0107,Mateo Muller,customer107@example.org,N/A,2025/03/04,Nairobi,备注：老客户
+C0901,Lena Novak,customer057@example.org,0057 555 057,03/04/2025,Toronto,
+C0108,杨磊,customer108@example.org,N/A,4 Mar 2025,	上海 ,"Said ""call after 5pm"""
+C0109,Jamal Rossi,customer109@example.com,+1 555 0109,,Austin,"Prefers email, not phone"
+C0110,David Novak,customer110@example.net,0110 555 110,03/04/2025,Austin,Café owner ☕
+C0111,Ines Haddad,customer111@example.net,N/A,2025-04-03,Austin,"Said ""call after 5pm"""
+C0112,Hiro Kim,customer112@example.com,N/A,2025-04-03,Nairobi,
+C0113,Ines Smith,customer113@example.com,N/A,,Toronto,Café owner ☕
+C0114,David Smith,customer114@example.net,N/A,2025/03/04,上海,Café owner ☕
+C0115,  Kofi Chen ,customer115@example.com,N/A,2025/03/04,Lisbon,
+C0116,Mateo Silva,customer116@example.com,+1 555 0116,03/04/2025,	Toronto ,N/A
+C0117,陈静,customer117@example.com,0117 555 117,2025-04-03,Nairobi,"Line one
+Line two"
+C0118,Tara Haddad,customer118@example.net,0118 555 118,20250304,Zürich,Café owner ☕
+C0119,Omar Rossi,customer119@example.net,,4 Mar 2025,Berlin,N/A
+C0120,David Muller,customer120@example.net,0120 555 120,4 Mar 2025,Lisbon,
+C0121,Hiro Chen,customer121@example.net,+1 555 0121,03/04/2025,Berlin,"Line one
+Line two"
+C0122,  Omar Haddad,customer122@example.org,N/A,2025-04-03,Austin,"Said ""call after 5pm"""
+C0123,Jamal Silva,customer123@example.com,0123 555 123,4 Mar 2025,Austin,"Line one
+Line two"
+C0124,David Novak,customer124@example.com,0124 555 124,4 Mar 2025,Toronto,
+C0125,Bob Chen,customer125@example.org,N/A,2025/03/04,Lisbon,Café owner ☕
+C0126,陈静,customer126@example.net,,4 Mar 2025,Nairobi,备注：老客户
+C0127,Priya Silva,customer127@example.com,+1 555 0127,2025/03/04,São Paulo,N/A
+C0128,Ines Smith,customer128@example.com,0128 555 128,,Berlin,"Said ""call after 5pm"""
+C0129,Sven Smith,customer129@example.com,,20250304,上海,"Said ""call after 5pm"""
+C0130,Farid Haddad,customer130@example.org,,2025-04-03,上海,"Prefers email, not phone"
+C0131,Nora Kim,customer131@example.org,+1 555 0131,03/04/2025,São Paulo,"Line one
+Line two"
+C0132,Priya Rossi,	customer132@example.net ,,20250304,Berlin,Café owner ☕
+C0133,Carmen Kim,customer133@example.org,N/A,2025-04-03,Zürich,备注：老客户
+C0900,Sven Smith, customer129@example.com ,,20250304,上海,"Said ""call after 5pm"""
+C0134,Alice Novak,customer134@example.org,,2025-04-03,Austin,备注：老客户
+C0135,杨磊,customer135@example.net,,,	上海 ,
+C0136,Grace Rossi,customer136@example.net,0136 555 136,4 Mar 2025,上海,Café owner ☕
+C0137,David Smith,customer137@example.net,0137 555 137,,Toronto,"Said ""call after 5pm"""
+C0138,Rosa Smith,customer138@example.net,,2025-04-03,Austin,
+C0139,   ,customer139@example.net,0139 555 139,2025/03/04,Osaka,备注：老客户
+C0140,Ines Okafor,customer140@example.org,,03/04/2025,上海,备注：老客户
+C0991,Short Row,x991@example.com
+C0141,Elena Okafor,customer141@example.com,0141 555 141,2025-04-03,Osaka,"Line one
+Line two"
+C0142,Kofi Novak,customer142@example.org,+1 555 0142,4 Mar 2025,Osaka,N/A
+C0143,Sven Silva,customer143@example.com,,20250304,上海,"Prefers email, not phone"
+C0144,杨磊,customer144@example.net,,2025/03/04,São Paulo,VIP
+C0145,Hiro Haddad,customer145@example.org,0145 555 145,2025/03/04,Berlin,"Prefers email, not phone"
+C0146,Priya Okafor,customer146@example.org,0146 555 146,2025/03/04,Berlin,
+C0147,Quinn Haddad,customer147@example.org,+1 555 0147,2025/03/04,Lisbon,备注：老客户
+C0148,Omar Smith,customer148@example.net,0148 555 148,2025/03/04,Toronto,
+C0149,Priya Rossi,customer149@example.org,,,Lisbon,"Prefers email, not phone"
+C0150,Rosa Okafor,customer150@example.org,,20250304,Berlin,N/A
+C0151,,broken@,N/A,03/04/2025,Lisbon,"Line one
+Line two"
+C0152, David Garcia ,customer152@example.org,0152 555 152,,Osaka,
+C0153,张伟,customer153@example.org,+1 555 0153,4 Mar 2025,São Paulo,"Prefers email, not phone"
+C0154,Nora Chen,customer154@example.com,,20250304,Toronto,
+C0155,Farid Garcia,customer155@example.net,,20250304,Austin,Café owner ☕
+C0156,Sven Chen,customer156@example.com,,,Osaka,Café owner ☕
+C0157,Ines Smith,customer157@example.org,N/A,,Nairobi,
+C0158,Carmen Silva,customer158@example.org,N/A,,Zürich,"Said ""call after 5pm"""
+C0950,Jamal Silva,CUSTOMER123@EXAMPLE.COM,0123 555 123,4 Mar 2025,Austin,"Line one
+Line two"
+C0159,Omar Rossi,customer159@example.com,,2025/03/04,Lisbon,VIP
+C0160,Mateo Haddad,customer160@example.org,N/A,,Osaka,
+C0161,Mateo Rossi,customer161@example.com,+1 555 0161,20250304,上海,"Said ""call after 5pm"""
+C0903,Alice Novak,customer134@example.org,,2025-04-03,Austin,备注：老客户
+C0162,刘洋,customer162@example.net,N/A,03/04/2025,Austin,N/A
+C0163,Ines Chen,customer163@example.net,+1 555 0163,,Berlin,"Said ""call after 5pm"""
+C0164,Omar Smith,customer164@example.net,N/A,,Toronto,
+C0165,Jamal Kim,customer165@example.net,,03/04/2025,Austin,
+C0166,Rosa Kim,customer166@example.net,N/A,03/04/2025,Osaka,Café owner ☕
+C0167,Jamal Kim,customer167@example.com,,2025-04-03,Toronto,VIP
+C0168,Mateo Novak,customer168@example.org,+1 555 0168,2025/03/04,Berlin,"Said ""call after 5pm"""
+C0169,Rosa Garcia,customer169@example.org,N/A,,Osaka,N/A
+C0170,Mateo Kim,@example.com,0170 555 170,2025/03/04,Berlin,N/A
+C0171,杨磊,customer171@example.net,0171 555 171,,Lisbon,Café owner ☕
+C0172,Jamal Okafor,customer172@example.com,0172 555 172,2025-04-03,Berlin,"Said ""call after 5pm"""
+C0173,Priya Garcia,customer173@example.com,0173 555 173,20250304,Toronto,"Line one
+Line two"
+C0174,Omar Kim,customer174@example.net,,20250304,Toronto,"Line one
+Line two"
+C0905,Tara Haddad,customer118@example.net,0118 555 118,20250304,Zürich,Café owner ☕
+C0175,David Silva,customer175@example.net,,4 Mar 2025,Berlin,"Prefers email, not phone"
+C0176,Grace Silva,  ,0176 555 176,4 Mar 2025,Lisbon,"Prefers email, not phone"
+C0177,Rosa Kim,customer177@example.com,,4 Mar 2025,Austin,
+C0178,Omar Garcia,customer178@example.net,0178 555 178,,Berlin,
+C0179,Kofi Muller,a@@example.com,0179 555 179,2025-04-03,Nairobi,VIP
+C0180,刘洋,customer180@example.com,N/A,03/04/2025,Berlin,"Said ""call after 5pm"""

@@ -36,14 +36,18 @@ Otherwise the run fails with a clear error listing the missing columns, and **no
 
 ## 4. Processing order (fixed)
 
-1. **Read.** Reject: 0-byte or whitespace-only file (`EmptyFileError`); missing/blank/duplicate
-   header names (`HeaderError`); undecodable UTF-8 (`EncodingError`).
-2. **Structure check.** A row whose field count differs from the header goes to issues with reason
-   `field_count_mismatch` and skips all further steps (its values are kept as raw text in issues).
+1. **Read.** Reject: 0-byte or whitespace-only file (`EmptyFileError`); blank/duplicate
+   header names, or the reserved names `source_row`, `reasons`, `raw_record` (`HeaderError`);
+   undecodable UTF-8 (`EncodingError`).
+2. **Structure check.** A row whose field count differs from the header (including a blank line
+   in the middle of the file) goes to issues with reason `field_count_mismatch` and skips all
+   further steps. Its original fields are kept, re-joined as CSV text, in `raw_record`.
 3. **Trim.** Apply to `trim_columns`. Each actual change is written to the change log.
 4. **Validate.** For each remaining row, collect ALL reasons:
    - `missing_required:<column>`
    - `invalid_email:<column>`
+   Reason order: all `missing_required` (header column order), then all `invalid_email`
+   (header column order). A missing value is not also format-checked.
    Rows with ≥1 reason go to issues. A row is never dropped silently.
 5. **De-duplicate** among rows that passed validation only. Key comparison is exact, case-sensitive,
    on the trimmed values. Removed rows go to issues with reason `duplicate_of:<kept source_row>`.
@@ -67,10 +71,10 @@ A row with several reasons counts once in `issue_rows`; reason counts are report
 
 | File | Content |
 |---|---|
-| `clean.csv` | Header columns + values after trim, rows in `source_row` order. |
-| `issues.csv` | `source_row`, `reasons` (`;`-joined, fixed order), then original columns (post-trim values; raw values for field-count rows). |
+| `clean.csv` | `source_row`, then the header columns with values after trim, rows in `source_row` order. |
+| `issues.csv` | `source_row`, `reasons` (`;`-joined, fixed order), the header columns (post-trim values; empty for field-count rows), `raw_record` (original fields for field-count rows, else empty). |
 | `changes.csv` | `source_row`, `column`, `action` (`trim`), `old_value`, `new_value`. |
-| `summary.json` | Tool version, input file name + SHA-256, rules, counts, reason counts, output file names. |
+| `summary.json` | Tool version, input file name + SHA-256 + size, columns, rules, counts, reason counts (`duplicate` groups all `duplicate_of:N`), `accounting_ok`, output file names. |
 
 - CSV outputs use UTF-8 with BOM (`utf-8-sig`) so Excel shows Chinese correctly; `\n` line endings.
 - `summary.json` contains no timestamp and no absolute paths, so the same input + rules gives
@@ -85,7 +89,9 @@ CLI:
 python -m csvclean INPUT.csv --out OUTDIR [--rules rules.json] [--trim a,b] [--required a,b]
        [--email col] [--dedupe-keys a,b] [--keep first|last] [--force]
 ```
-Exit codes: `0` success, `2` input/rule error (message on stderr), `1` unexpected error.
+Exit codes: `0` success, `2` input/rule/output error (message on stderr), `1` unexpected error.
+`render_outputs()` returns the exact output bytes; the CLI writes them and the UI offers them
+as downloads, so both produce identical files.
 
 Streamlit UI: upload → preview (first rows + column list + row count) → choose rules from the
 real header → Run → tabs for Clean / Issues / Change log / Summary → download each output file.
