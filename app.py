@@ -54,10 +54,11 @@ if st.session_state.get("input_sha") != digest:  # new input: drop old results
     st.session_state.pop("result", None)
 
 try:
-    header, body = read_table(data)
+    parsed = read_table(data)
 except CsvCleanError as e:
     st.error(f"Cannot read this file: {e}")
     st.stop()
+header, body = parsed.header, parsed.rows
 
 # ---- 2. Preview -----------------------------------------------------------
 st.header("2. Preview")
@@ -67,6 +68,9 @@ c1.metric("Data rows", len(body))
 c2.metric("Columns", len(header))
 c3.metric("Rows with wrong field count", bad_shape)
 st.caption(f"File: {name} · SHA-256 {digest[:12]}… · showing first {min(PREVIEW_ROWS, len(body))} rows")
+if parsed.trailing_blank_lines:
+    st.caption(f"Ignored {parsed.trailing_blank_lines} empty line(s) at the end of the file "
+               "(not data rows; also recorded in summary.json).")
 preview = [(r + [""] * len(header))[: len(header)] for r in body[:PREVIEW_ROWS]]
 st.dataframe(table(header, preview), width="stretch", hide_index=True)
 if bad_shape:
@@ -110,12 +114,14 @@ m[0].metric("Input rows", c["input_rows"])
 m[1].metric("Clean rows", c["clean_rows"])
 m[2].metric("Issue rows", c["issue_rows"])
 m[3].metric("Cells trimmed", c["changed_cells"])
-ok = "✅" if summary["accounting_ok"] else "❌"
 st.markdown(
-    f"{ok} **{c['input_rows']} input = {c['clean_rows']} clean + {c['issue_rows']} issues** "
+    f"**{c['input_rows']} input = {c['clean_rows']} clean + {c['issue_rows']} issues** "
     f"(field count {c['field_count_mismatch_rows']} · invalid {c['invalid_rows']} · "
     f"duplicate {c['duplicate_rows']})"
 )
+ok = "✅" if summary["accounting_ok"] else "❌"
+st.caption(f"{ok} Output check: clean.csv and issues.csv were re-read; each of the "
+           f"{c['input_rows']} input rows appears in exactly one of them.")
 t_clean, t_issues, t_log, t_sum = st.tabs(
     [f"Clean data ({c['clean_rows']})", f"Issues ({c['issue_rows']})",
      f"Change log ({c['changed_cells']})", "Summary"])

@@ -42,7 +42,7 @@ def test_ui_full_flow_matches_expected():
     assert shown["Clean rows"] == str(c["clean_rows"])
     assert shown["Issue rows"] == str(c["issue_rows"])
     assert shown["Cells trimmed"] == str(c["changed_cells"])
-    assert any("✅" in md.value for md in at.markdown)
+    assert any(cap.value.startswith("✅ Output check") for cap in at.caption)
     assert len(at.tabs) == 4
 
 

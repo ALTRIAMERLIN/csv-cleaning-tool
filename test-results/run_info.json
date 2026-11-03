@@ -1,0 +1,18 @@
+{
+  "date_utc": "2026-11-03",
+  "csvclean_version": "0.1.0",
+  "python": "3.11.9",
+  "os": "Windows 10",
+  "result": "40 passed in 1.03s",
+  "exit_code": 0,
+  "source_sha256": "af3baacb18d4d50449c839bb8a1476cff73c9ad629275b680514ca2e1b63925e",
+  "source_paths": [
+    "app.py",
+    "pyproject.toml",
+    "requirements.txt",
+    "src",
+    "tests",
+    "scripts",
+    "data"
+  ]
+}

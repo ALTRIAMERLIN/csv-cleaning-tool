@@ -12,6 +12,7 @@ import os
 import re
 from collections import Counter
 from dataclasses import asdict, dataclass, field
+from typing import NamedTuple
 
 from csvclean import __version__
 
@@ -33,6 +34,10 @@ class HeaderError(CsvCleanError):
 
 
 class EncodingError(CsvCleanError):
+    pass
+
+
+class ParseError(CsvCleanError):
     pass
 
 
@@ -81,6 +86,12 @@ class Result:
     summary: dict
 
 
+class Table(NamedTuple):
+    header: list[str]
+    rows: list[list[str]]
+    trailing_blank_lines: int
+
+
 def is_missing(value: str) -> bool:
     return value.strip() == ""
 
@@ -102,6 +113,8 @@ def _decode(data: bytes) -> str:
 
 
 def _check_header(header: list[str]) -> None:
+    if not header:
+        raise HeaderError("The first line is empty. The first line must be the header row.")
     blanks = [i + 1 for i, h in enumerate(header) if h.strip() == ""]
     if blanks:
         raise HeaderError(f"Blank header name at column position(s): {blanks}")
@@ -130,22 +143,35 @@ def _raw_record(fields: list[str]) -> str:
     return buf.getvalue()
 
 
-def read_table(data: bytes) -> tuple[list[str], list[list[str]]]:
-    """Decode and parse. Returns (header, data records). Used by process() and the UI preview."""
+def read_table(data: bytes) -> Table:
+    """Decode and parse. Used by process() and the UI preview.
+
+    Empty records at the very end of the file are removed and counted, not treated as rows.
+    """
     text = _decode(data)
+    reader = csv.reader(io.StringIO(text, newline=""))
+    records: list[list[str]] = []
     try:
-        records = list(csv.reader(io.StringIO(text, newline="")))
+        for record in reader:
+            records.append(record)
     except csv.Error as e:
-        raise HeaderError(f"CSV could not be parsed: {e}") from None
+        raise ParseError(f"CSV could not be parsed near line {reader.line_num}: {e}") from None
+    if not records:
+        raise EmptyFileError("File is empty: it has no header row.")
     header = records[0]
     _check_header(header)
-    return header, records[1:]
+    rows = records[1:]
+    trailing = 0
+    while rows and rows[-1] == []:
+        rows.pop()
+        trailing += 1
+    return Table(header, rows, trailing)
 
 
 def process(data: bytes, rules: Rules, input_name: str) -> Result:
     """Run read -> structure check -> trim -> validate -> dedupe. No file I/O."""
-    header, body = read_table(data)
-    records = [header, *body]
+    table = read_table(data)
+    header = table.header
     _check_rules(rules, header)
 
     trim_set = set(rules.trim_columns)
@@ -158,7 +184,7 @@ def process(data: bytes, rules: Rules, input_name: str) -> Result:
     mismatch = invalid = 0
     reason_counts: Counter = Counter()
 
-    for idx, fields in enumerate(records[1:], start=1):
+    for idx, fields in enumerate(table.rows, start=1):
         if len(fields) != len(header):
             mismatch += 1
             reason_counts["field_count_mismatch"] += 1
@@ -217,7 +243,7 @@ def process(data: bytes, rules: Rules, input_name: str) -> Result:
     else:
         clean = [{"source_row": idx, **values} for idx, values in valid]
 
-    input_rows = len(records) - 1
+    input_rows = len(table.rows)
     issue_rows = [issues[k] for k in sorted(issues)]
     counts = {
         "input_rows": input_rows,
@@ -228,20 +254,17 @@ def process(data: bytes, rules: Rules, input_name: str) -> Result:
         "duplicate_rows": duplicate,
         "changed_cells": len(changes),
     }
-    accounted = sorted([r["source_row"] for r in clean] + [r["source_row"] for r in issue_rows])
     summary = {
         "tool": "csvclean",
         "version": __version__,
         "input_file": os.path.basename(input_name),
         "input_sha256": hashlib.sha256(data).hexdigest(),
         "input_bytes": len(data),
+        "trailing_blank_lines_ignored": table.trailing_blank_lines,
         "columns": header,
         "rules": rules.to_dict(),
         "counts": counts,
         "reason_counts": dict(sorted(reason_counts.items())),
-        "accounting_ok": accounted == list(range(1, input_rows + 1))
-        and input_rows == counts["clean_rows"] + counts["issue_rows"]
-        and counts["issue_rows"] == mismatch + invalid + duplicate,
         "outputs": list(OUTPUT_FILES),
     }
     return Result(header, clean, issue_rows, changes, summary)
@@ -255,24 +278,62 @@ def _csv_bytes(columns: list[str], rows: list[dict]) -> bytes:
     return buf.getvalue().encode("utf-8-sig")
 
 
+def _read_back(b: bytes) -> list[dict]:
+    return list(csv.DictReader(io.StringIO(b.decode("utf-8-sig"), newline="")))
+
+
+def check_accounting(files: dict[str, bytes], counts: dict) -> bool:
+    """Re-read the rendered clean.csv and issues.csv, independent of the processing counters.
+
+    True only if every source_row 1..input_rows appears exactly once across both files and the
+    per-file and per-issue-kind row counts match `counts`.
+    """
+    try:
+        clean = _read_back(files["clean.csv"])
+        issues = _read_back(files["issues.csv"])
+        rows = sorted(int(r["source_row"]) for r in clean + issues)
+        mismatch = sum(r["reasons"] == "field_count_mismatch" for r in issues)
+        duplicate = sum(r["reasons"].startswith("duplicate_of:") for r in issues)
+    except (KeyError, ValueError, TypeError, AttributeError, csv.Error):
+        return False
+    return (
+        rows == list(range(1, counts["input_rows"] + 1))
+        and len(clean) == counts["clean_rows"]
+        and len(issues) == counts["issue_rows"]
+        and mismatch == counts["field_count_mismatch_rows"]
+        and duplicate == counts["duplicate_rows"]
+        and len(issues) - mismatch - duplicate == counts["invalid_rows"]
+    )
+
+
 def render_outputs(result: Result) -> dict[str, bytes]:
     """Exact bytes of every output file. The UI downloads these; the CLI writes them."""
     h = result.header
-    return {
+    files = {
         "clean.csv": _csv_bytes(["source_row", *h], result.clean_rows),
         "issues.csv": _csv_bytes(["source_row", "reasons", *h, "raw_record"], result.issue_rows),
         "changes.csv": _csv_bytes(
             ["source_row", "column", "action", "old_value", "new_value"], result.changes
         ),
-        "summary.json": (
-            json.dumps(result.summary, ensure_ascii=False, indent=2) + "\n"
-        ).encode("utf-8"),
     }
+    summary = {**result.summary,
+               "accounting_ok": check_accounting(files, result.summary["counts"])}
+    files["summary.json"] = (json.dumps(summary, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    return files
+
+
+def _write_file(path: str, data: bytes) -> None:
+    with open(path, "wb") as f:
+        f.write(data)
 
 
 def write_outputs(result: Result, out_dir: str, force: bool = False,
-                  input_path: str | None = None) -> list[str]:
-    """Write all outputs into out_dir. Never overwrites the input or (without force) old outputs."""
+                  input_path: str | None = None) -> dict[str, bytes]:
+    """Write all outputs into out_dir and return their bytes.
+
+    Never overwrites the input or (without force) old outputs. Files go to temporary names first
+    and are renamed into place only after every write succeeded.
+    """
     files = render_outputs(result)
     targets = {name: os.path.join(out_dir, name) for name in files}
     if input_path is not None:
@@ -281,13 +342,25 @@ def write_outputs(result: Result, out_dir: str, force: bool = False,
             os.path.normcase(os.path.realpath(p)) == src for p in targets.values()
         ):
             raise OutputError("Output would overwrite the input file. Choose another folder.")
+    if os.path.exists(out_dir) and not os.path.isdir(out_dir):
+        raise OutputError(f"Output path exists and is not a folder: {out_dir}")
     existing = [n for n, p in targets.items() if os.path.exists(p)]
     if existing and not force:
         raise OutputError(
             f"Output files already exist: {', '.join(existing)}. Use --force to overwrite."
         )
-    os.makedirs(out_dir, exist_ok=True)
-    for name, path in targets.items():
-        with open(path, "wb") as f:
-            f.write(files[name])
-    return list(files)
+    temps = {name: os.path.join(out_dir, f".{name}.{os.getpid()}.tmp") for name in files}
+    try:
+        os.makedirs(out_dir, exist_ok=True)
+        for name, data in files.items():
+            _write_file(temps[name], data)
+        for name in files:
+            os.replace(temps[name], targets[name])
+    except OSError as e:
+        for p in temps.values():
+            try:
+                os.remove(p)
+            except OSError:
+                pass
+        raise OutputError(f"Could not write outputs to {out_dir}: {e.strerror or e}") from None
+    return files

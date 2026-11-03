@@ -34,7 +34,7 @@ def load_rules(args: argparse.Namespace) -> Rules:
         try:
             with open(args.rules, encoding="utf-8") as f:
                 d = json.load(f)
-        except (OSError, json.JSONDecodeError) as e:
+        except (OSError, ValueError) as e:  # ValueError covers bad JSON and non-UTF-8 bytes
             raise RuleError(f"Cannot read rules file: {e}") from None
         if not isinstance(d, dict):
             raise RuleError("Rules file must contain a JSON object")
@@ -55,18 +55,21 @@ def main(argv: list[str] | None = None) -> int:
             with open(args.input, "rb") as f:
                 data = f.read()
         except OSError as e:
-            raise CsvCleanError(f"Cannot read input: {e.strerror}") from None
-        result = process(data, rules, args.input)
-        write_outputs(result, args.out, force=args.force, input_path=args.input)
+            raise CsvCleanError(f"Cannot read input: {e.strerror or e}") from None
+        files = write_outputs(process(data, rules, args.input), args.out, force=args.force,
+                              input_path=args.input)
     except CsvCleanError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
-    c = result.summary["counts"]
+    summary = json.loads(files["summary.json"])
+    c = summary["counts"]
     print(
         f"input={c['input_rows']} clean={c['clean_rows']} issues={c['issue_rows']} "
         f"(field_count={c['field_count_mismatch_rows']} invalid={c['invalid_rows']} "
         f"duplicate={c['duplicate_rows']}) changed_cells={c['changed_cells']} "
-        f"accounting_ok={result.summary['accounting_ok']}"
+        f"accounting_ok={summary['accounting_ok']}"
     )
+    if summary["trailing_blank_lines_ignored"]:
+        print(f"ignored {summary['trailing_blank_lines_ignored']} empty line(s) at the end of the file")
     print(f"outputs written to: {args.out}")
     return 0

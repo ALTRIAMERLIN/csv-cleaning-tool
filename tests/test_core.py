@@ -9,10 +9,11 @@ from pathlib import Path
 
 import pytest
 
+from csvclean import core
 from csvclean.cli import main as cli_main
 from csvclean.core import (
-    EmptyFileError, EncodingError, HeaderError, OutputError, RuleError, Rules,
-    process, render_outputs, write_outputs,
+    EmptyFileError, EncodingError, HeaderError, OutputError, ParseError, RuleError, Rules,
+    check_accounting, process, render_outputs, write_outputs,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -35,16 +36,25 @@ def read_csv(b: bytes) -> list[dict]:
     return list(csv.DictReader(io.StringIO(b.decode("utf-8-sig"), newline="")))
 
 
-def assert_accounting(result):
-    s = result.summary
-    c = s["counts"]
-    rows = sorted([r["source_row"] for r in result.clean_rows]
-                  + [r["source_row"] for r in result.issue_rows])
-    assert rows == list(range(1, c["input_rows"] + 1))
-    assert c["input_rows"] == c["clean_rows"] + c["issue_rows"]
+def assert_accounting(result, n_input: int):
+    """Check the written files against a row count the test knows independently."""
+    files = render_outputs(result)
+    clean, issues = read_csv(files["clean.csv"]), read_csv(files["issues.csv"])
+    rows = sorted(int(r["source_row"]) for r in clean + issues)
+    assert rows == list(range(1, n_input + 1))
+    c = result.summary["counts"]
+    assert c["input_rows"] == n_input == c["clean_rows"] + c["issue_rows"]
+    assert (len(clean), len(issues)) == (c["clean_rows"], c["issue_rows"])
     assert c["issue_rows"] == (c["field_count_mismatch_rows"] + c["invalid_rows"]
                                + c["duplicate_rows"])
-    assert s["accounting_ok"] is True
+    assert json.loads(files["summary.json"])["accounting_ok"] is True
+
+
+def rewrite_csv(b: bytes, edit) -> bytes:
+    rows = edit(list(csv.reader(io.StringIO(b.decode("utf-8-sig"), newline=""))))
+    buf = io.StringIO(newline="")
+    csv.writer(buf, lineterminator="\n").writerows(rows)
+    return buf.getvalue().encode("utf-8-sig")
 
 
 # AC-01
@@ -53,7 +63,7 @@ def test_normal_input():
     c = r.summary["counts"]
     assert (c["clean_rows"], c["issue_rows"], c["changed_cells"]) == (3, 0, 0)
     assert [row["name"] for row in r.clean_rows] == ["Ann", "Bo", "Cy"]
-    assert_accounting(r)
+    assert_accounting(r, 3)
 
 
 # AC-02
@@ -79,7 +89,7 @@ def test_whitespace_only_file():
 def test_header_only(tmp_path):
     r = run("id,name,email\n", Rules(required_columns=["email"]))
     assert all(v == 0 for v in r.summary["counts"].values())
-    assert_accounting(r)
+    assert_accounting(r, 0)
     files = write_outputs(r, str(tmp_path / "o"))
     assert sorted(files) == sorted(p.name for p in (tmp_path / "o").iterdir())
     assert len(files) == 4
@@ -114,7 +124,7 @@ def test_dedupe_keep_first():
     r = run(DUP, Rules(dedupe_keys=["email"], dedupe_keep="first"))
     assert [row["id"] for row in r.clean_rows] == ["1", "2"]
     assert reasons(r) == {3: "duplicate_of:1"}
-    assert_accounting(r)
+    assert_accounting(r, 3)
 
 
 # AC-08
@@ -122,7 +132,7 @@ def test_dedupe_keep_last():
     r = run(DUP, Rules(dedupe_keys=["email"], dedupe_keep="last"))
     assert [row["id"] for row in r.clean_rows] == ["2", "3"]
     assert reasons(r) == {1: "duplicate_of:3"}
-    assert_accounting(r)
+    assert_accounting(r, 3)
 
 
 # AC-09
@@ -224,7 +234,7 @@ def test_field_count_mismatch():
     raw = {row["source_row"]: row["raw_record"] for row in r.issue_rows}
     assert raw == {1: "1,Ann,a@x.com,EXTRA", 2: "2,Bo"}
     assert r.summary["counts"]["field_count_mismatch_rows"] == 2
-    assert_accounting(r)
+    assert_accounting(r, 3)
 
 
 # AC-21
@@ -247,7 +257,7 @@ def test_synthetic_matches_expected():
     assert r.summary["counts"] == exp["counts"]
     assert r.summary["reason_counts"] == exp["reason_counts"]
     assert {str(k): v for k, v in reasons(r).items()} == exp["issues"]
-    assert_accounting(r)
+    assert_accounting(r, exp["counts"]["input_rows"])  # count from the generator's own plan
 
 
 # AC-23
@@ -309,3 +319,94 @@ def test_rules_from_dict_rejects_unknown():
         Rules.from_dict({"trim": ["a"]})
     with pytest.raises(RuleError):
         run("id\n1\n", Rules(dedupe_keep="middle"))
+
+
+# AC-28
+def test_trailing_blank_lines():
+    r = run("id,email\n1,a@x.com\n\n\n", Rules(required_columns=["email"]))
+    assert r.summary["counts"]["input_rows"] == 1 and r.issue_rows == []
+    assert r.summary["trailing_blank_lines_ignored"] == 2
+    assert_accounting(r, 1)
+    h = run("id,name,email\n\r\n", Rules(required_columns=["email"]))
+    assert all(v == 0 for v in h.summary["counts"].values())
+    assert h.summary["trailing_blank_lines_ignored"] == 1
+    m = run("id,email\n1,a@x.com\n\n2,b@x.com\n")  # empty line BETWEEN rows is still an issue
+    assert reasons(m) == {2: "field_count_mismatch"}
+    assert m.summary["trailing_blank_lines_ignored"] == 0
+    assert_accounting(m, 3)
+
+
+# AC-29
+def test_leading_blank_line():
+    with pytest.raises(HeaderError, match="first line"):
+        process(b"\nid,email\n1,a@x.com\n", Rules(), "l.csv")
+
+
+# AC-30
+def test_parse_error_is_not_header_error(tmp_path):
+    big = "x" * (csv.field_size_limit() + 1)
+    text = f'id,note\n1,ok\n2,"{big}"\n'
+    with pytest.raises(ParseError, match="line 3"):
+        run(text)
+    assert not issubclass(ParseError, HeaderError)
+    src = tmp_path / "big.csv"
+    src.write_text(text, encoding="utf-8")
+    assert cli_main([str(src), "--out", str(tmp_path / "o")]) == 2
+    assert not (tmp_path / "o").exists()
+
+
+# AC-31
+def test_cli_out_is_a_file(tmp_path, capsys):
+    taken = tmp_path / "taken"
+    taken.write_text("keep me", encoding="utf-8")
+    assert cli_main([str(DEMO_CSV), "--out", str(taken), "--rules", str(DEMO_RULES)]) == 2
+    err = capsys.readouterr().err
+    assert err.startswith("error:") and "Traceback" not in err
+    assert taken.read_text(encoding="utf-8") == "keep me"
+
+
+# AC-31
+def test_failed_write_leaves_nothing(tmp_path, monkeypatch, capsys):
+    real, calls = core._write_file, []
+
+    def flaky(path, data):
+        calls.append(path)
+        if len(calls) == 3:
+            raise OSError(28, "No space left on device")
+        real(path, data)
+
+    monkeypatch.setattr(core, "_write_file", flaky)
+    out = tmp_path / "o"
+    assert cli_main([str(DEMO_CSV), "--out", str(out), "--rules", str(DEMO_RULES)]) == 2
+    err = capsys.readouterr().err
+    assert "No space left on device" in err and "Traceback" not in err
+    assert len(calls) == 3
+    assert list(out.iterdir()) == []  # no outputs and no temporary files left behind
+
+
+# AC-32
+def test_cli_bad_rules_file(tmp_path):
+    bad = tmp_path / "rules.json"
+    out = tmp_path / "o"
+    bad.write_bytes('{"trim_columns": ["名字"]}'.encode("gbk"))
+    assert cli_main([str(DEMO_CSV), "--out", str(out), "--rules", str(bad)]) == 2
+    bad.write_text("{not json", encoding="utf-8")
+    assert cli_main([str(DEMO_CSV), "--out", str(out), "--rules", str(bad)]) == 2
+    bad.write_text("[1, 2]", encoding="utf-8")
+    assert cli_main([str(DEMO_CSV), "--out", str(out), "--rules", str(bad)]) == 2
+    assert not out.exists()
+
+
+# AC-33
+def test_accounting_check_detects_tampering():
+    r = process(DEMO_CSV.read_bytes(), demo_rules(), "demo_customers.csv")
+    files, counts = render_outputs(r), r.summary["counts"]
+    assert check_accounting(files, counts) is True
+    dropped = dict(files, **{"clean.csv": rewrite_csv(files["clean.csv"], lambda x: x[:-1])})
+    assert check_accounting(dropped, counts) is False
+    doubled = dict(files, **{"issues.csv": rewrite_csv(files["issues.csv"],
+                                                       lambda x: x + [x[1]])})
+    assert check_accounting(doubled, counts) is False
+    mangled = dict(files, **{"clean.csv": rewrite_csv(
+        files["clean.csv"], lambda x: [x[0], ["abc", *x[1][1:]], *x[2:]])})
+    assert check_accounting(mangled, counts) is False

@@ -36,9 +36,13 @@ Otherwise the run fails with a clear error listing the missing columns, and **no
 
 ## 4. Processing order (fixed)
 
-1. **Read.** Reject: 0-byte or whitespace-only file (`EmptyFileError`); blank/duplicate
-   header names, or the reserved names `source_row`, `reasons`, `raw_record` (`HeaderError`);
-   undecodable UTF-8 (`EncodingError`).
+1. **Read.** Reject: 0-byte or whitespace-only file (`EmptyFileError`); an empty first line,
+   blank/duplicate header names, or the reserved names `source_row`, `reasons`, `raw_record`
+   (`HeaderError`; the first line must be the header, leading empty lines are not skipped);
+   undecodable UTF-8 (`EncodingError`); CSV syntax the parser rejects, such as a field over
+   Python's csv field size limit (`ParseError`, with the line number).
+   Empty lines at the very end of the file are not data rows: they are ignored and counted in
+   `summary.json` as `trailing_blank_lines_ignored`, so nothing disappears unreported.
 2. **Structure check.** A row whose field count differs from the header (including a blank line
    in the middle of the file) goes to issues with reason `field_count_mismatch` and skips all
    further steps. Its original fields are kept, re-joined as CSV text, in `raw_record`.
@@ -67,6 +71,11 @@ Each input `source_row` appears exactly once: either in `clean.csv` or in `issue
 A row with several reasons counts once in `issue_rows`; reason counts are reported separately
 (`reason_counts`), so their sum may exceed `invalid_rows`.
 
+`accounting_ok` in `summary.json` is not taken from the processing counters. It is computed by
+re-reading the rendered `clean.csv` and `issues.csv` bytes: every `source_row` from 1 to
+`input_rows` must appear exactly once, and the row counts per file and per issue kind must match
+`counts`. A dropped, duplicated or mangled output row makes it `false`.
+
 ## 6. Outputs (written into an output folder)
 
 | File | Content |
@@ -74,13 +83,17 @@ A row with several reasons counts once in `issue_rows`; reason counts are report
 | `clean.csv` | `source_row`, then the header columns with values after trim, rows in `source_row` order. |
 | `issues.csv` | `source_row`, `reasons` (`;`-joined, fixed order), the header columns (post-trim values; empty for field-count rows), `raw_record` (original fields for field-count rows, else empty). |
 | `changes.csv` | `source_row`, `column`, `action` (`trim`), `old_value`, `new_value`. |
-| `summary.json` | Tool version, input file name + SHA-256 + size, columns, rules, counts, reason counts (`duplicate` groups all `duplicate_of:N`), `accounting_ok`, output file names. |
+| `summary.json` | Tool version, input file name + SHA-256 + size, `trailing_blank_lines_ignored`, columns, rules, counts, reason counts (`duplicate` groups all `duplicate_of:N`), output file names, `accounting_ok`. |
 
 - CSV outputs use UTF-8 with BOM (`utf-8-sig`) so Excel shows Chinese correctly; `\n` line endings.
 - `summary.json` contains no timestamp and no absolute paths, so the same input + rules gives
   byte-identical outputs.
 - The input file is never modified. The tool refuses to write if the output folder is the input
   file's own path, and refuses to overwrite existing outputs unless `--force` is given.
+- An output path that exists but is not a folder, or any failure to create the folder or write a
+  file, raises `OutputError` (CLI exit 2 with a message, no traceback). All four files are first
+  written to temporary names in the output folder and renamed into place only after every write
+  succeeded; on failure the temporary files are removed, so no partial new output set is left.
 
 ## 7. Interfaces
 
@@ -90,6 +103,8 @@ python -m csvclean INPUT.csv --out OUTDIR [--rules rules.json] [--trim a,b] [--r
        [--email col] [--dedupe-keys a,b] [--keep first|last] [--force]
 ```
 Exit codes: `0` success, `2` input/rule/output error (message on stderr), `1` unexpected error.
+A rules file that cannot be read, is not UTF-8, or is not a JSON object raises `RuleError` (exit 2).
+Dependency minimums are the versions actually tested (Streamlit 1.66.1, Playwright 1.64.1).
 `render_outputs()` returns the exact output bytes; the CLI writes them and the UI offers them
 as downloads, so both produce identical files.
 
