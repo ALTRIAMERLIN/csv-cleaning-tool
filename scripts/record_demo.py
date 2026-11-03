@@ -1,19 +1,24 @@
 """Record one real demo run of the local Streamlit page and write demo/demo_manifest.json.
 
-The page is driven by Playwright in Microsoft Edge (headless) and recorded at 1920x1080:
+The page is driven by Playwright in Microsoft Edge (headless) at 1920x1080:
 upload the synthetic CSV -> preview -> set rules -> run -> view clean data, issues, change log
 and summary -> download the four files. The downloads are then checked against the core
 output and against a separate CLI run. Every number in the manifest comes from this run.
 
-A small cursor marker is injected into the page so viewers can see where the script points
-and clicks. Nothing else on the page is changed.
+Recording: every frame Edge paints is captured with the DevTools screencast (JPEG, quality 92)
+together with its timestamp, then ffmpeg encodes the frames at their real timing into one
+uncut 30 fps H.264 file. No cuts and no speed changes.
 
-Usage: python scripts/record_demo.py [--force]
-Writes: demo/recording/raw_recording.webm (untouched original), demo/screens/*.png,
+A small cursor marker is injected into the page so viewers can see where the script points
+and clicks. It is hidden while screenshots are taken. Nothing else on the page is changed.
+
+Usage: python scripts/record_demo.py [--force]   (needs ffmpeg on PATH)
+Writes: demo/recording/raw_recording.mp4, demo/screens/*.png,
         demo/outputs/* (downloaded files), demo/demo_manifest.json
 """
 from __future__ import annotations
 
+import base64
 import csv
 import hashlib
 import io
@@ -73,15 +78,56 @@ def git(*args: str) -> str:
                           check=True).stdout.strip()
 
 
+class Screencast:
+    """Save every painted frame with its browser timestamp (seconds since the epoch)."""
+
+    def __init__(self, page: Page, folder: Path):
+        self.folder = folder
+        self.frames: list[tuple[float, str]] = []
+        self.cdp = page.context.new_cdp_session(page)
+        self.cdp.on("Page.screencastFrame", self._on_frame)
+
+    def start(self) -> None:
+        self.cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 92,
+                                               "maxWidth": SIZE["width"],
+                                               "maxHeight": SIZE["height"], "everyNthFrame": 1})
+
+    def _on_frame(self, params: dict) -> None:
+        name = f"f{len(self.frames):06d}.jpg"
+        (self.folder / name).write_bytes(base64.b64decode(params["data"]))
+        ts = params.get("metadata", {}).get("timestamp") or time.time()
+        self.frames.append((float(ts), name))
+        self.cdp.send("Page.screencastFrameAck", {"sessionId": params["sessionId"]})
+
+    def stop(self) -> None:
+        self.cdp.send("Page.stopScreencast")
+
+
+def encode(frames: list[tuple[float, str]], folder: Path, end: float, out: Path) -> None:
+    """Encode frames at their real timing (variable gaps) into constant 30 fps H.264."""
+    lines = ["ffconcat version 1.0"]
+    for i, (ts, name) in enumerate(frames):
+        nxt = frames[i + 1][0] if i + 1 < len(frames) else max(end, ts + 1 / 30)
+        lines += [f"file '{name}'", f"duration {max(nxt - ts, 0.001):.6f}"]
+    lines.append(f"file '{frames[-1][1]}'")  # concat demuxer needs the last entry repeated
+    (folder / "frames.ffconcat").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    subprocess.run(
+        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
+         "-i", "frames.ffconcat", "-vf",
+         "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2",
+         "-fps_mode", "cfr", "-r", "30", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
+         "-pix_fmt", "yuv420p", "-threads", "4", "-movflags", "+faststart", "-an", str(out)],
+        cwd=folder, check=True)
+
+
 class Demo:
     def __init__(self, page: Page):
         self.page = page
-        self.t0 = time.monotonic()
         self.timeline: list[dict] = []
         self.screens: list[str] = []
 
     def mark(self, event: str) -> None:
-        self.timeline.append({"t": round(time.monotonic() - self.t0, 2), "event": event})
+        self.timeline.append({"epoch": time.time(), "event": event})
 
     def pause(self, ms: int) -> None:
         self.page.wait_for_timeout(ms)
@@ -131,13 +177,14 @@ class Demo:
         self.pause(500)
 
 
-def run_demo(url: str, video_dir: Path, downloads: Path) -> dict:
+def run_demo(url: str, frames_dir: Path, downloads: Path) -> dict:
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="msedge", headless=True)
-        ctx = browser.new_context(viewport=SIZE, accept_downloads=True,
-                                  record_video_dir=str(video_dir), record_video_size=SIZE)
+        ctx = browser.new_context(viewport=SIZE, accept_downloads=True)
         ctx.add_init_script(CURSOR_JS)
         page = ctx.new_page()
+        cast = Screencast(page, frames_dir)
+        cast.start()
         d = Demo(page)
         page.goto(url)
         page.get_by_text("Upload a CSV file to begin").wait_for(timeout=30000)
@@ -211,21 +258,30 @@ def run_demo(url: str, video_dir: Path, downloads: Path) -> dict:
         d.shot("06_downloads.png")
         d.pause(2500)
         d.mark("end")
+        end = time.time()
+        d.pause(300)
+        cast.stop()
         browser_version = browser.version
         ctx.close()
-        raw = DEMO / "recording" / "raw_recording.webm"
-        page.video.save_as(str(raw))
         browser.close()
-    return {"timeline": d.timeline, "screens": d.screens, "browser": browser_version, "raw": raw}
+    if not cast.frames:
+        raise RuntimeError("the screencast produced no frames")
+    raw = DEMO / "recording" / "raw_recording.mp4"
+    encode(cast.frames, frames_dir, end, raw)
+    start = cast.frames[0][0]
+    timeline = [{"t": round(e["epoch"] - start, 2), "event": e["event"]} for e in d.timeline]
+    return {"timeline": timeline, "screens": d.screens, "browser": browser_version, "raw": raw,
+            "frames": len(cast.frames), "span_s": round(end - start, 2)}
 
 
-def probe_duration(path: Path) -> float | None:
-    try:
-        out = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
-                              "-of", "csv=p=0", str(path)], capture_output=True, text=True).stdout
-        return round(float(out.strip()), 2)
-    except (OSError, ValueError):
-        return None
+def probe(path: Path) -> dict:
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries",
+                          "stream=width,height,avg_frame_rate,nb_frames:format=duration",
+                          "-of", "json", str(path)], capture_output=True, text=True, check=True)
+    j = json.loads(out.stdout)
+    s = j["streams"][0]
+    return {"width": s["width"], "height": s["height"], "fps": s["avg_frame_rate"],
+            "frames": int(s.get("nb_frames", 0)), "duration_s": round(float(j["format"]["duration"]), 2)}
 
 
 def main() -> int:
@@ -243,7 +299,8 @@ def main() -> int:
 
     recorded = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with tempfile.TemporaryDirectory() as tmp, local_app() as url:
-        info = run_demo(url, Path(tmp) / "video", DEMO / "outputs")
+        (Path(tmp) / "frames").mkdir()
+        info = run_demo(url, Path(tmp) / "frames", DEMO / "outputs")
 
         cli_dir = Path(tmp) / "cli"
         cli = subprocess.run([sys.executable, "-m", "csvclean", str(CSV), "--out", str(cli_dir),
@@ -285,13 +342,16 @@ def main() -> int:
         "rules": RULES,
         "recording": {
             "raw_file": raw.relative_to(ROOT).as_posix(), "bytes": raw.stat().st_size,
-            "sha256": sha256(raw.read_bytes()), "duration_s": probe_duration(raw),
-            "size": f"{SIZE['width']}x{SIZE['height']}", "container": "webm (VP8, no audio)",
+            "sha256": sha256(raw.read_bytes()), **probe(raw), "codec": "H.264, no audio",
+            "captured_frames": info["frames"], "captured_span_s": info["span_s"],
             "how": "Real local Streamlit page (127.0.0.1) in Microsoft Edge, driven by "
-                   "scripts/record_demo.py with Playwright and recorded by Playwright. "
-                   "The file is the untouched original: no cuts, no speed changes.",
+                   "scripts/record_demo.py with Playwright. Every painted frame was captured "
+                   "with the DevTools screencast (JPEG quality 92) and encoded by ffmpeg at "
+                   "its real timestamp. Complete run: no cuts, no speed changes.",
             "page_changes": "A cursor marker was injected to show where the script points "
-                            "and clicks. It is hidden in the screenshots. Nothing else changed.",
+                            "and clicks. It is hidden while screenshots are taken, so it "
+                            "blinks off briefly in the video. Nothing else changed.",
+            "timeline_note": "t = seconds from the first recorded frame",
             "timeline": info["timeline"],
         },
         "screenshots": info["screens"],

@@ -1,6 +1,6 @@
 ============================= test session starts =============================
 platform win32 -- Python 3.11.9, pytest-9.2.0, pluggy-1.7.0 -- <local>\Scripts\python.exe
-rootdir: <local>
+rootdir: <local>\.kiro\crew\workspace\csv-cleaning-tool
 configfile: pyproject.toml
 testpaths: tests
 plugins: anyio-4.16.0
@@ -49,5 +49,5 @@ tests/test_core.py::test_failed_rename_is_reported PASSED                [ 95%]
 tests/test_skeleton.py::test_package_imports PASSED                      [ 97%]
 tests/test_skeleton.py::test_cli_parser PASSED                           [100%]
 
-- generated xml file: <local>\test-results\junit.xml -
-============================= 42 passed in 1.03s ==============================
+- generated xml file: <local>\.kiro\crew\workspace\csv-cleaning-tool\test-results\junit.xml -
+============================= 42 passed in 1.27s ==============================
